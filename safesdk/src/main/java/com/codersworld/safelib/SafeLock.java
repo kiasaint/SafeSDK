@@ -253,7 +253,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                                 onSafeRecords("100", mActivity.getString(R.string.something_wrong), null);
                             }
                         } else {
-                            onSafeRecords("100", mActivity.getString(R.string.something_wrong), null);
+                            onSafeRecords("100","No records found for this device.", null);
                         }
                     } catch (Exception ex1) {
                         onSafeRecords("100", mActivity.getString(R.string.something_wrong), null);

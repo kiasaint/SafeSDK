@@ -3,7 +3,7 @@ package com.codersworld.safelib.utils;
 
 import android.util.Log;
 
-import com.example.librarymain.BuildConfig;
+import com.depl.safelib.BuildConfig;
 
 
 /**
