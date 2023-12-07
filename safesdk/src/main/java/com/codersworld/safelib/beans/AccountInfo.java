@@ -73,7 +73,7 @@ public class AccountInfo extends ServerError {
     public String getMd5Pwd() {
         return md5Pwd;
     }
-
+    //
     public void setMd5Pwd(String md5Pwd) {
         this.md5Pwd = md5Pwd;
     }
