@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-android'
     id 'kotlin-android-extensions'
+    id 'maven-publish'
 }
 android {
     compileSdk 33
@@ -60,3 +61,16 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.11.0'
 
 }//this is the library project to convert into .jar file as lib for main project
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId = 'com.github.kiasaint'
+            artifactId = 'SafeSDK'
+            version = '1.0.0'
+
+            afterEvaluate {
+                from components.release
+            }
+        }
+    }
+}
