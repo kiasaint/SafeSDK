@@ -208,9 +208,10 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                                     }
                                     onSafeDevices("106", mActivity.getString(R.string.something_wrong), mAllLocksBean.getNewusercreation());
                                 } else {
+                                    //no data found
                                     onSafeDevices("103", mActivity.getString(R.string.something_wrong), null);
                                 }
-                            } else {
+                            } else {//message from api
                                 onSafeDevices("102", mActivity.getString(R.string.something_wrong), null);
                             }
                         } else {
@@ -319,7 +320,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         onAuthResult("106", mActivity.getString(R.string.login_success));
     }
 
-    private void closeLock(String lockData, String macID) {
+    public void closeLock(String lockData, String macID) {
         long unlockdate = System.currentTimeMillis();
         if (iniDateTime < unlockdate) {
             return;
@@ -347,7 +348,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     }
 
 
-    private void openLock(long unlockdate, String lockID, String macID) {
+    public void openLock(long unlockdate, String lockID, String macID) {
         myVib.vibrate(100);
         if (iniDateTime < unlockdate) {
             Toast.makeText(mActivity, "Please Refresh Page", Toast.LENGTH_SHORT).show();
