@@ -14,11 +14,13 @@ android {
         vectorDrawables.useSupportLibrary = true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+      //  consumerProguardFiles 'lib-proguard-rules.txt'
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+           // shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
