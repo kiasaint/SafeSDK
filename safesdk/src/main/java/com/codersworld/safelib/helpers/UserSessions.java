@@ -14,6 +14,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.codersworld.configs.urls.common.Constants;
 
 public class UserSessions {
     public static SharedPreferences mPrefs = null;
@@ -41,38 +42,38 @@ public class UserSessions {
     public static void saveAccessToken(Context ctx, String strToken) {
         mContext = ctx;
         initSession();
-        prefsEditor.putString(Tags.SB_ACCESS_TOKEN, strToken);
+        prefsEditor.putString(Constants.SB_ACCESS_TOKEN, strToken);
         prefsEditor.commit();
     }
 
     public static String getAccessToken(Context ctx) {
         mContext = ctx;
         initSession();
-        return mPrefs.getString(Tags.SB_ACCESS_TOKEN, "");
+        return mPrefs.getString(Constants.SB_ACCESS_TOKEN, "");
     }
 
 
     public static void saveUserInfo(Context ctx, LoginBean.InfoBean mUserBean) {
         mContext = ctx;
         initSession();
-        prefsEditor.putString(Tags.SB_USER_INFO, (mUserBean != null) ? new Gson().toJson(mUserBean) : "");
+        prefsEditor.putString(Constants.SB_USER_INFO, (mUserBean != null) ? new Gson().toJson(mUserBean) : "");
         prefsEditor.commit();
     }
 
     public static void clearUserInfo(Context ctx) {
         mContext = ctx;
         initSession();
-        prefsEditor.putString(Tags.SB_USER_INFO, "");
+        prefsEditor.putString(Constants.SB_USER_INFO, "");
         prefsEditor.commit();
     }
 
     public static LoginBean.InfoBean getUserInfo(Context ctx) {
         mContext = ctx;
         initSession();
-        if (mPrefs.getString(Tags.SB_USER_INFO, "").isEmpty()) {
+        if (mPrefs.getString(Constants.SB_USER_INFO, "").isEmpty()) {
             return null;
         } else {
-            return new Gson().fromJson(mPrefs.getString(Tags.SB_USER_INFO, ""), LoginBean.InfoBean.class);
+            return new Gson().fromJson(mPrefs.getString(Constants.SB_USER_INFO, ""), LoginBean.InfoBean.class);
         }
     }
 
@@ -81,17 +82,17 @@ public class UserSessions {
         mContext = ctx;
         initSession();
         String str = new Gson().toJson(mList);
-        prefsEditor.putString(Tags.SB_TT_KEY_LIST, str);
+        prefsEditor.putString(Constants.SB_TT_KEY_LIST, str);
         prefsEditor.commit();
     }
 
     public static ArrayList<KeyListObj.KeyObj> getKeyLists(Context ctx) {
         mContext = ctx;
         initSession();
-        if (mPrefs.getString(Tags.SB_TT_KEY_LIST, "").isEmpty()) {
+        if (mPrefs.getString(Constants.SB_TT_KEY_LIST, "").isEmpty()) {
             return null;
         } else {
-            return new Gson().fromJson(mPrefs.getString(Tags.SB_TT_KEY_LIST, ""), new TypeToken<List<KeyListObj.KeyObj>>() {
+            return new Gson().fromJson(mPrefs.getString(Constants.SB_TT_KEY_LIST, ""), new TypeToken<List<KeyListObj.KeyObj>>() {
             }.getType());
             //return new Gson().fromJson(mPrefs.getString(Tags.SB_USER_OTHER_INFO, ""), UserOtherInfoBean.InfoBean.class);
         }
@@ -100,18 +101,18 @@ public class UserSessions {
     public static void saveTTAccountInfo(Context context, String str) {
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = mPrefs.edit();
-        editor.putString(Tags.SB_TT_ACCOUNT_INFO, CommonMethods.isValidString(str) ? str : "");
+        editor.putString(Constants.SB_TT_ACCOUNT_INFO, CommonMethods.isValidString(str) ? str : "");
         editor.commit();
     }
 
     public static AccountInfo getTTAccountInfo(Context context) {
         mContext = context;
         initSession();
-        if (mPrefs.getString(Tags.SB_TT_ACCOUNT_INFO, "").isEmpty()) {
+        if (mPrefs.getString(Constants.SB_TT_ACCOUNT_INFO, "").isEmpty()) {
             return null;
         } else {
-            Log.e("account_info1", mPrefs.getString(Tags.SB_TT_ACCOUNT_INFO, ""));
-            return new Gson().fromJson(mPrefs.getString(Tags.SB_TT_ACCOUNT_INFO, ""), AccountInfo.class);
+            Log.e("account_info1", mPrefs.getString(Constants.SB_TT_ACCOUNT_INFO, ""));
+            return new Gson().fromJson(mPrefs.getString(Constants.SB_TT_ACCOUNT_INFO, ""), AccountInfo.class);
         }
     }
 

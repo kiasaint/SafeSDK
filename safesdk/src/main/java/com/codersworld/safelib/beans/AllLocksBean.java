@@ -8,10 +8,20 @@ import java.util.ArrayList;
 public class AllLocksBean implements Serializable {
     @SerializedName("success")
     int success;
+   @SerializedName("loginvalidation")
+    int loginvalidation;
     @SerializedName("message")
     String message;
     @SerializedName("newusercreation")
     ArrayList<InfoBean> newusercreation;
+
+    public int getLoginvalidation() {
+        return loginvalidation;
+    }
+
+    public void setLoginvalidation(int loginvalidation) {
+        this.loginvalidation = loginvalidation;
+    }
 
     public ArrayList<InfoBean> getNewusercreation() {
         return newusercreation;

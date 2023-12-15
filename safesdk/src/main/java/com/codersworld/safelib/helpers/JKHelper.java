@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.codersworld.configs.urls.common.Links;
 import com.codersworld.safelib.database.DatabaseHelper;
 import com.codersworld.safelib.database.DatabaseManager;
 import com.codersworld.safelib.database.dao.OTPDao;
@@ -26,7 +27,7 @@ import com.codersworld.safelib.beans.AccountInfo;
 import com.codersworld.safelib.beans.GenerateOTP;
 import com.codersworld.safelib.beans.LoginBean;
 import com.codersworld.safelib.rest.ApiCall;
-import com.codersworld.safelib.rest.ApiRequest;
+import com.codersworld.configs.rest.ApiRequest;
 import com.codersworld.safelib.rest.OnResponse;
 import com.codersworld.safelib.rest.UniverSelObjct;
 import com.codersworld.safelib.rest.ttlock.RetrofitAPIManager;
@@ -43,7 +44,7 @@ import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
-
+import com.codersworld.configs.urls.common.Constants;
 /**
  * Created by Mr.Mad on 02/02/2023.
  */
@@ -66,8 +67,8 @@ public class JKHelper extends Application implements OnResponse<UniverSelObjct> 
         if (mBeanUser != null) {
             strPassword = (CommonMethods.isValidString(mBeanUser.getBtmailpwd())) ? DigitUtil.getMD5(mBeanUser.getBtmailpwd()) : "";
             username = (CommonMethods.isValidString(mBeanUser.getBtmainuserId())) ? mBeanUser.getBtmainuserId() : "";
-            ClientID = (CommonMethods.isValidString(mBeanUser.getClientid())) ? mBeanUser.getClientid() : Tags.TT_CLIENT_ID;
-            ClientSecret = (CommonMethods.isValidString(mBeanUser.getClientsecret())) ? mBeanUser.getClientsecret() : Tags.TT_CLIENT_SECRET;
+            ClientID = (CommonMethods.isValidString(mBeanUser.getClientid())) ? mBeanUser.getClientid() : Links.TT_CLIENT_ID;
+            ClientSecret = (CommonMethods.isValidString(mBeanUser.getClientsecret())) ? mBeanUser.getClientsecret() : Links.TT_CLIENT_SECRET;
         }
         new ApiCall(ctx).ttlockAuth(this, ClientID, ClientSecret, username, strPassword);
     }
@@ -107,7 +108,7 @@ public class JKHelper extends Application implements OnResponse<UniverSelObjct> 
             GenerateOTP mOTP = mListGenerateOTP.get(0);
             id = mOTP.getId();
             this.mActivity = ctx;
-            String params = Tags.SB_OPEN_LOCK + "&ContactID=" + mOTP.getContactId() + "&DeviceID=" + mOTP.getDeviceId() + "&Rpwd=" + mOTP.getRpwd() + "&GenratePwd=" + mOTP.getOtp() + "&VehicleNo=" + mOTP.getVehicalNo() + "&type=" + mOTP.getType() + "&OtpGenerationTime=" + mOTP.getOtpGenerateTime() + "&Flag=" + "offline";
+            String params = Links.SB_OPEN_LOCK + "&ContactID=" + mOTP.getContactId() + "&DeviceID=" + mOTP.getDeviceId() + "&Rpwd=" + mOTP.getRpwd() + "&GenratePwd=" + mOTP.getOtp() + "&VehicleNo=" + mOTP.getVehicalNo() + "&type=" + mOTP.getType() + "&OtpGenerationTime=" + mOTP.getOtpGenerateTime() + "&Flag=" + "offline";
             AESHelper mAESHelper = new AESHelper();
             String encParam = mAESHelper.safeEncryption(ctx, params);
             new ApiCall(ctx).uploadGeneratedOTP(this, encParam, mOTP.getId() + "");
@@ -206,7 +207,7 @@ public class JKHelper extends Application implements OnResponse<UniverSelObjct> 
             Log.e("typewr", "success : " + response.getMethodname());
             switch (response.getMethodname()) {
 
-                case Tags.SB_OPEN_LOCK:
+                case Links.SB_OPEN_LOCK:
                     try {
                         String strResponse = response.getResponse().toString();
                         if (CommonMethods.isValidString(strResponse)) {
@@ -224,7 +225,7 @@ public class JKHelper extends Application implements OnResponse<UniverSelObjct> 
                     }
                     break;
 
-                case Tags.SB_API_TTLOCK_AUTH_TOKEN:
+                case Links.SB_API_TTLOCK_AUTH_TOKEN:
                     try {
                         Boolean isError = true;
                         String msg = "";
@@ -280,10 +281,10 @@ public class JKHelper extends Application implements OnResponse<UniverSelObjct> 
         Log.e("typewr", type + " error : " + error);
         try {
             switch (type) {
-                case Tags.SB_OPEN_LOCK:
+                case Links.SB_OPEN_LOCK:
                     uploadGeneratedOTP(mActivity);
                     break;
-                case Tags.SB_API_TTLOCK_AUTH_TOKEN:
+                case Links.SB_API_TTLOCK_AUTH_TOKEN:
                     try {
                         if (mAuthCount < 2) {
                             mAuthCount++;
@@ -325,8 +326,8 @@ public class JKHelper extends Application implements OnResponse<UniverSelObjct> 
         String password = "e10adc3949ba59abbe56e057f20f883e";//DigitUtil.getMD5(prefs.getPrefsbtAdminPass());
         String ClientID = "";
         String ClientSecret = "";
-        ClientID = Tags.TT_CLIENT_ID;
-        ClientSecret = Tags.TT_CLIENT_SECRET;
+        ClientID = Links.TT_CLIENT_ID;
+        ClientSecret = Links.TT_CLIENT_SECRET;
         Log.e("ttlock_auth=" + i, "username=" + account + " ; password=" + UserSessions.getUserInfo(mActivity).getPassword() + " ; md5=" + password);
         Call<String> call = apiService.ttlockAuth(ClientID, ClientSecret, account, password);
         call.enqueue(new Callback<String>() {

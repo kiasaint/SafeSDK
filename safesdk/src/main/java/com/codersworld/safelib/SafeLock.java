@@ -1,30 +1,25 @@
 package com.codersworld.safelib;
 
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.LocationManager;
 import android.os.Vibrator;
-import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+import com.codersworld.configs.urls.common.Links;
+import com.codersworld.configs.urls.vehicletrack.membocool;
 import com.codersworld.safelib.helpers.AESHelper;
 import com.codersworld.safelib.helpers.JKHelper;
-import com.codersworld.safelib.helpers.Tags;
 import com.codersworld.safelib.helpers.UserSessions;
 import com.codersworld.safelib.listeners.OnAuthListener;
 import com.codersworld.safelib.listeners.OnSafeAuthListener;
@@ -46,15 +41,14 @@ import com.ttlock.bl.sdk.constant.ControlAction;
 import com.ttlock.bl.sdk.entity.ControlLockResult;
 import com.ttlock.bl.sdk.entity.LockError;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
+
+import com.codersworld.configs.urls.common.Constants;
 
 public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     static Activity mActivity;
@@ -85,6 +79,16 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         statusCheck();
         try {
             final BluetoothAdapter bAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
             bAdapter.enable();
         } catch (Exception e) {
             e.printStackTrace();
@@ -103,7 +107,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         final AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
         builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
                 .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                .setPositiveButton(mActivity.getResources().getString(R.string.lbl_yes), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
                         mActivity.startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                     }
@@ -115,11 +119,12 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     public void authUser(String strUsername, String strPassword, String strAppVersion, String strAppName) {
         initApiCall();
         new UserSessions().saveAccessToken(mActivity,"");
-        String param = Tags.SB_LOGIN_API + "&uid=" + strUsername + "&pwd=" + strPassword + "&GCMID=" + "&version=" + strAppVersion + "&lat=" + strLat + "&lng=" + strLong + "&EMIENo=" + CommonMethods.getIMEI(
-                mActivity);
-        Log.e("paramparam", param);
+/*        String param = Links.SB_LOGIN_API + "&uid=" + strUsername + "&pwd=" + strPassword + "&GCMID=" + "&version=" + strAppVersion + "&lat=" + strLat + "&lng=" + strLong + "&EMIENo=" + CommonMethods.getIMEI(
+                mActivity);*/
+        //Log.e("paramparam", param);
         AESHelper mAESHelper = new AESHelper();
-        String encParam = mAESHelper.safeEncryption(mActivity, param);
+        String encParam = mAESHelper.safeEncryption(mActivity, membocool.getLoginParams(strUsername,strPassword,strAppVersion,strLat,strLong,CommonMethods.getIMEI(
+                mActivity)));
         if (CommonMethods.isNetworkAvailable(mActivity)) {
             HashMap mMap = new HashMap<String, String>();
             mMap.put("val", encParam);
@@ -134,9 +139,9 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     public void getDeviceList() {
         initApiCall();
         mListLocks = new ArrayList<>();
-        String params = Tags.SB_GET_ALL_V3_LOCKS + "&cat=1&cid=" + UserSessions.getUserInfo(mActivity).getUid();
+        //String params = Links.SB_GET_ALL_V3_LOCKS + "&"+ com.codersworld.configs.urls.common.Constants.P_CAT+"=1&"+ com.codersworld.configs.urls.common.Constants.P_CID+"=" + UserSessions.getUserInfo(mActivity).getUid();
         AESHelper mAESHelper = new AESHelper();
-        String encParam = mAESHelper.safeEncryption(mActivity, params);
+        String encParam = mAESHelper.safeEncryption(mActivity, membocool.getDevicesparams( UserSessions.getUserInfo(mActivity).getUid()));
       //  mApiCall.getAllV3Locks(this, "1",UserSessions.getUserInfo(mActivity).getUid());
 
         mApiCall.getAllV3Locks(this, encParam);
@@ -156,11 +161,13 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     public void getDeviceRecords(String startDate, String endDate, String device_id, String device_name) {
         initApiCall();
         mListLocks = new ArrayList<>();
-        String params = Tags.SB_API_GET_GATE_RECORDS + "&contactid=" + UserSessions.getUserInfo(mActivity).getUid() +
+/*
+        String params = Links.SB_API_GET_GATE_RECORDS + "&"+ com.codersworld.configs.urls.common.Constants.P_CONTACT_ID+"=" + UserSessions.getUserInfo(mActivity).getUid() +
                 "&DeviceId=" + device_id + "&VehicleNumber=" + device_name +
                 "&ToDate=" + endDate + "&FromDate=" + startDate + "&val1=" + "0" + "&val2=";
+*/
         AESHelper mAESHelper = new AESHelper();
-        String encParam = mAESHelper.safeEncryption(mActivity, params);
+        String encParam = mAESHelper.safeEncryption(mActivity, membocool.getRecordsParams( UserSessions.getUserInfo(mActivity).getUid(),device_id,device_name,endDate,startDate));
         mApiCall.getGateRecords(this, encParam);
     }
 
@@ -168,7 +175,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     public void onSuccess(UniverSelObjct response) {
         try {
             switch (response.getMethodname()) {
-                case Tags.SB_LOGIN_API:
+                case Links.SB_LOGIN_API:
                     try {
                         LoginBean mLoginBean = (LoginBean) response.getResponse();
                         Log.e("mLoginBean", new Gson().toJson(mLoginBean));
@@ -194,7 +201,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                         onAuthResult("100", mActivity.getString(R.string.something_wrong));
                     }
                     break;
-                case Tags.SB_GET_ALL_V3_LOCKS:
+                case Links.SB_GET_ALL_V3_LOCKS:
                     try {
                         AllLocksBean mAllLocksBean = (AllLocksBean) response.getResponse();
                         if (mAllLocksBean != null) {
@@ -222,7 +229,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                         onSafeDevices("100", mActivity.getString(R.string.something_wrong), null);
                     }
                     break;
-                case Tags.SB_API_GET_GATE_RECORDS:
+                case Links.SB_API_GET_GATE_RECORDS:
                     try {
                         JSONObject jsonObjct = new JSONObject(response.getResponse().toString());
                         if (jsonObjct.getInt("success") == 1) {
@@ -295,17 +302,17 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     public void onError(String type, String error) {
         try {
             switch (type) {
-                case Tags.SB_LOGIN_API:
+                case Links.SB_LOGIN_API:
                     if (mAuthListener != null) {
                         onAuthResult("100", error);
                     }
                     break;
-                case Tags.SB_GET_ALL_V3_LOCKS:
+                case Links.SB_GET_ALL_V3_LOCKS:
                     if (mAuthListener != null) {
                         onSafeDevices("100", error, null);
                     }
                     break;
-                case Tags.SB_API_GET_GATE_RECORDS:
+                case Links.SB_API_GET_GATE_RECORDS:
                     if (mAuthListener != null) {
                         onSafeRecords("100", error, null);
                     }
@@ -408,70 +415,6 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     }
 
 
-    public void hitApi() {
-         StringRequest postRequest = new StringRequest(Request.Method.POST, Tags.BASE_URL_MEMBOCOOL,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                         try {
-                            AESHelper jkHelper = new AESHelper();
-                            String responses = jkHelper.safeDecryption(response, mActivity);
-                            Log.e("respAfterDec",responses);
-                            final int chunkSize = 20480;
-                            for (int i = 0; i < responses.length(); i += chunkSize) {
-                                Log.i("hitApiRemote", responses.substring(i, Math.min(responses.length(), i + chunkSize)));
-                            }
-                            JSONObject jsonObject = new JSONObject(responses);
-                            int success = jsonObject.getInt("success");
-                             if (success == 1) {
-
-                              } else if (success == 0) {
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-
-                    }
-                }
-        ) {
-             @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                try {
-                    String param = Tags.SB_GET_ALL_V3_LOCKS + "&cat=1&cid=" + UserSessions.getUserInfo(mActivity).getUid();
-/*
-                    if (strtop5.equalsIgnoreCase("1")) {
-                        param = param + "&istop5=" + strtop5;
-                    }
-                    if (strSingleItem.equalsIgnoreCase("1")) {
-                        param = param + "&deviceId=" + strSearchValue;
-                    }
-*/
-                    Log.e("beforeEnc",param);
-                    AESHelper jkHelper = new AESHelper();
-                    String finalparam = jkHelper.safeEncryption( mActivity,param);
-                    params.put("val", finalparam);
-                    Log.e("afterEnc",finalparam);
-                    return params;
-                } catch (Exception e) {
-                    //method=GetV3lockdetail&cat=1&cid=96820&deviceId=
-                    //method=GetV3lockdetail&cat=1&cid=96820
-                    e.printStackTrace();
-                    return params;
-                }
-            }
-        };
-        postRequest.setRetryPolicy(new DefaultRetryPolicy(
-                60000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        Volley.newRequestQueue(mActivity).add(postRequest);
-    }
 
 
 }

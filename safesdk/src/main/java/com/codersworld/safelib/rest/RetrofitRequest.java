@@ -2,7 +2,7 @@ package com.codersworld.safelib.rest;
 
 import android.util.Log;
 
-import com.codersworld.safelib.helpers.Tags;
+import com.codersworld.configs.urls.common.Links;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ttlock.bl.sdk.util.LogUtil;
@@ -36,11 +36,11 @@ public class RetrofitRequest {
          retrofit=null;
          String baseUrl = "";
          if(urlType==1){
-             baseUrl = Tags.BASE_URL_MEMBOCOOL;
+             baseUrl = Links.BASE_URL_MEMBOCOOL;
          }else if(urlType==3){
-             baseUrl =Tags.BASE_URL_TTLOCK;
+             baseUrl = Links.BASE_URL_TTLOCK;
          }else{
-             baseUrl = Tags.BASE_URL_MMTHINKBIZ;
+             baseUrl = Links.BASE_URL_MMTHINKBIZ;
          }
         Log.e("baseUrl1",baseUrl);
          if (retrofit == null) {

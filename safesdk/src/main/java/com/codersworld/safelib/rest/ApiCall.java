@@ -4,15 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
+import com.codersworld.configs.urls.common.Links;
 import com.codersworld.safelib.helpers.UserSessions;
 import com.codersworld.safelib.helpers.AESHelper;
-import com.codersworld.safelib.helpers.Tags;
-import com.codersworld.safelib.helpers.UserSessions;
-import com.codersworld.safelib. beans.AccountInfo;
+ import com.codersworld.safelib. beans.AccountInfo;
 import com.codersworld.safelib.beans.AllLocksBean;
 import com.codersworld.safelib.beans.KeyListObj;
 import com.codersworld.safelib.beans.LoginBean;
-import com.codersworld.safelib.rest.UniverSelObjct;
 import com.codersworld.safelib.rest.ttlock.RetrofitAPIManager;
 import com.codersworld.safelib.utils.CommonMethods;
 import com.codersworld.safelib.utils.SFProgress;
@@ -27,7 +25,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
+import com.codersworld.configs.rest.ApiRequest;
 public class ApiCall {
     public Activity mContext = null;
     public UserSessions mUserSessions = null;
@@ -58,13 +56,13 @@ public class ApiCall {
                             Log.e("response123", response.body().toString());
                             LoginBean mBean = new Gson().fromJson(strResp, LoginBean.class);
                             Log.e("strResp11", new Gson().toJson(mBean));
-                            onResponse.onSuccess(new UniverSelObjct(mBean, Tags.SB_LOGIN_API, "true", ""));
+                            onResponse.onSuccess(new UniverSelObjct(mBean, Links.SB_LOGIN_API, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            onResponse.onError(Tags.SB_LOGIN_API, mContext.getResources().getString(R.string.something_wrong));
+                            onResponse.onError(Links.SB_LOGIN_API, mContext.getResources().getString(R.string.something_wrong));
                         }
                     } else {
-                        onResponse.onError(Tags.SB_LOGIN_API, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_LOGIN_API, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -79,7 +77,7 @@ public class ApiCall {
                 }
                 t.printStackTrace();
                 Log.e("asfdas", call.request().toString() + "");
-                onResponse.onError(Tags.SB_LOGIN_API, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_LOGIN_API, mContext.getResources().getString(R.string.something_wrong));
             }
         });
     }
@@ -104,13 +102,13 @@ public class ApiCall {
                             Log.e("response123", response.body().toString());
                             AccountInfo mBean = new Gson().fromJson(strResp, AccountInfo.class);
                             Log.e("strResp11", new Gson().toJson(mBean));
-                            onResponse.onSuccess(new UniverSelObjct(mBean, Tags.SB_API_TTLOCK_AUTH_TOKEN, "true", ""));
+                            onResponse.onSuccess(new UniverSelObjct(mBean, Links.SB_API_TTLOCK_AUTH_TOKEN, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            onResponse.onError(Tags.SB_API_TTLOCK_AUTH_TOKEN, mContext.getResources().getString(R.string.something_wrong));
+                            onResponse.onError(Links.SB_API_TTLOCK_AUTH_TOKEN, mContext.getResources().getString(R.string.something_wrong));
                         }
                     } else {
-                        onResponse.onError(Tags.SB_API_TTLOCK_AUTH_TOKEN, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_API_TTLOCK_AUTH_TOKEN, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -125,7 +123,7 @@ public class ApiCall {
                 }
                 t.printStackTrace();
                 Log.e("asfdas", call.request().toString() + "");
-                onResponse.onError(Tags.SB_API_TTLOCK_AUTH_TOKEN, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_API_TTLOCK_AUTH_TOKEN, mContext.getResources().getString(R.string.something_wrong));
             }
         });
     }
@@ -140,15 +138,15 @@ public class ApiCall {
         Call< ResponseBody > call = mRequest.getUserKeyList(param);
         RetrofitAPIManager.enqueue(call,new TypeToken<KeyListObj>() {}, result->{
             if (!result.success) {
-                onResponse.onError(Tags.SB_API_TTLOCK_USER_KEYLIST, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_API_TTLOCK_USER_KEYLIST, mContext.getResources().getString(R.string.something_wrong));
                 return;
             }else{
                 KeyListObj keyListObj = result.getResult();
-                onResponse.onSuccess(new UniverSelObjct(keyListObj, Tags.SB_API_TTLOCK_USER_KEYLIST, "true", ""));
+                onResponse.onSuccess(new UniverSelObjct(keyListObj, Links.SB_API_TTLOCK_USER_KEYLIST, "true", ""));
             }
 
         }, requestError -> {
-            onResponse.onError(Tags.SB_API_TTLOCK_USER_KEYLIST, mContext.getResources().getString(R.string.something_wrong));
+            onResponse.onError(Links.SB_API_TTLOCK_USER_KEYLIST, mContext.getResources().getString(R.string.something_wrong));
         });
      }
     public void getGatewayList(OnResponse<UniverSelObjct> onResponse,  String... params) {
@@ -164,15 +162,15 @@ public class ApiCall {
             public void onResponse(Call<String> call, Response<String> response) {
                 String json = response.body();
                 if (json.contains("list")) {
-                    onResponse.onSuccess(new UniverSelObjct(json, Tags.SB_API_TTLOCK_GATEWAY_LIST, "true", ""));
+                    onResponse.onSuccess(new UniverSelObjct(json, Links.SB_API_TTLOCK_GATEWAY_LIST, "true", ""));
                 } else {
-                    onResponse.onError(Tags.SB_API_TTLOCK_GATEWAY_LIST, mContext.getResources().getString(R.string.something_wrong));
+                    onResponse.onError(Links.SB_API_TTLOCK_GATEWAY_LIST, mContext.getResources().getString(R.string.something_wrong));
                 }
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                onResponse.onError(Tags.SB_API_TTLOCK_GATEWAY_LIST, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_API_TTLOCK_GATEWAY_LIST, mContext.getResources().getString(R.string.something_wrong));
             }
         });
      }
@@ -191,19 +189,19 @@ public class ApiCall {
                 String json = response.body();
                 if (CommonMethods.isValidString(json)){
                     try {
-                        onResponse.onSuccess(new UniverSelObjct(json, Tags.SB_API_TTLOCK_UPLOAD_DETAIL, "true", (params.length>8)?params[8]:""));
+                        onResponse.onSuccess(new UniverSelObjct(json, Links.SB_API_TTLOCK_UPLOAD_DETAIL, "true", (params.length>8)?params[8]:""));
                     } catch (Exception e) {
                         e.printStackTrace();
-                        onResponse.onError(Tags.SB_API_TTLOCK_UPLOAD_DETAIL, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_API_TTLOCK_UPLOAD_DETAIL, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } else {
-                    onResponse.onError(Tags.SB_API_TTLOCK_UPLOAD_DETAIL, mContext.getResources().getString(R.string.something_wrong));
+                    onResponse.onError(Links.SB_API_TTLOCK_UPLOAD_DETAIL, mContext.getResources().getString(R.string.something_wrong));
                 }
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                onResponse.onError(Tags.SB_API_TTLOCK_UPLOAD_DETAIL, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_API_TTLOCK_UPLOAD_DETAIL, mContext.getResources().getString(R.string.something_wrong));
             }
         });
      }
@@ -222,19 +220,19 @@ public class ApiCall {
                 String json = response.body();
                 if (CommonMethods.isValidString(json)){
                     try {
-                        onResponse.onSuccess(new UniverSelObjct(json, Tags.SB_API_TTLOCK_RENAME, "true", (params.length>8)?params[8]:""));
+                        onResponse.onSuccess(new UniverSelObjct(json, Links.SB_API_TTLOCK_RENAME, "true", (params.length>8)?params[8]:""));
                     } catch (Exception e) {
                         e.printStackTrace();
-                        onResponse.onError(Tags.SB_API_TTLOCK_RENAME, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_API_TTLOCK_RENAME, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } else {
-                    onResponse.onError(Tags.SB_API_TTLOCK_RENAME, mContext.getResources().getString(R.string.something_wrong));
+                    onResponse.onError(Links.SB_API_TTLOCK_RENAME, mContext.getResources().getString(R.string.something_wrong));
                 }
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                onResponse.onError(Tags.SB_API_TTLOCK_RENAME, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_API_TTLOCK_RENAME, mContext.getResources().getString(R.string.something_wrong));
             }
         });
      }
@@ -253,19 +251,19 @@ public class ApiCall {
                 String json = response.body();
                 if (CommonMethods.isValidString(json)){
                     try {
-                        onResponse.onSuccess(new UniverSelObjct(json, Tags.SB_API_TTLOCK_RENAME_LOCK, "true", ""));
+                        onResponse.onSuccess(new UniverSelObjct(json, Links.SB_API_TTLOCK_RENAME_LOCK, "true", ""));
                     } catch (Exception e) {
                         e.printStackTrace();
-                        onResponse.onError(Tags.SB_API_TTLOCK_RENAME_LOCK, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_API_TTLOCK_RENAME_LOCK, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } else {
-                    onResponse.onError(Tags.SB_API_TTLOCK_RENAME_LOCK, mContext.getResources().getString(R.string.something_wrong));
+                    onResponse.onError(Links.SB_API_TTLOCK_RENAME_LOCK, mContext.getResources().getString(R.string.something_wrong));
                 }
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                onResponse.onError(Tags.SB_API_TTLOCK_RENAME_LOCK, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_API_TTLOCK_RENAME_LOCK, mContext.getResources().getString(R.string.something_wrong));
             }
         });
      }
@@ -284,19 +282,19 @@ public class ApiCall {
                 String json = response.body();
                 if (CommonMethods.isValidString(json)){
                     try {
-                        onResponse.onSuccess(new UniverSelObjct(json, Tags.SB_API_TTLOCK_INIT_SUCCESS, "true", ""));
+                        onResponse.onSuccess(new UniverSelObjct(json, Links.SB_API_TTLOCK_INIT_SUCCESS, "true", ""));
                     } catch (Exception e) {
                         e.printStackTrace();
-                        onResponse.onError(Tags.SB_API_TTLOCK_INIT_SUCCESS, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_API_TTLOCK_INIT_SUCCESS, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } else {
-                    onResponse.onError(Tags.SB_API_TTLOCK_INIT_SUCCESS, mContext.getResources().getString(R.string.something_wrong));
+                    onResponse.onError(Links.SB_API_TTLOCK_INIT_SUCCESS, mContext.getResources().getString(R.string.something_wrong));
                 }
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                onResponse.onError(Tags.SB_API_TTLOCK_INIT_SUCCESS, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_API_TTLOCK_INIT_SUCCESS, mContext.getResources().getString(R.string.something_wrong));
             }
         });
      }
@@ -310,14 +308,14 @@ public class ApiCall {
                         try {
                             Log.e("response123", response.body().toString());
                             String strResp = new AESHelper().safeDecryption(response.body().toString(), mContext);
-                            onResponse.onSuccess(new UniverSelObjct(strResp, Tags.SB_API_GET_GATE_RECORDS, "true", ""));
+                            onResponse.onSuccess(new UniverSelObjct(strResp, Links.SB_API_GET_GATE_RECORDS, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
                             Log.e("recharge_error","recharge_error : "+e.getMessage());
-                            onResponse.onError(Tags.SB_API_GET_GATE_RECORDS, mContext.getResources().getString(R.string.something_wrong));
+                            onResponse.onError(Links.SB_API_GET_GATE_RECORDS, mContext.getResources().getString(R.string.something_wrong));
                         }
                     } else {
-                        onResponse.onError(Tags.SB_API_GET_GATE_RECORDS, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_API_GET_GATE_RECORDS, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -328,7 +326,7 @@ public class ApiCall {
             public void onFailure(Call<String> call, Throwable t) {
                 t.printStackTrace();
                 Log.e("asfdas", call.request().toString() + "");
-                onResponse.onError(Tags.SB_API_GET_GATE_RECORDS, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_API_GET_GATE_RECORDS, mContext.getResources().getString(R.string.something_wrong));
             }
         });
     }
@@ -350,13 +348,13 @@ public class ApiCall {
                             Log.e("locksResp", response.body().toString());
                             AllLocksBean mBean = new Gson().fromJson(strResp,AllLocksBean.class);
                             Log.e("locksResp11",new Gson().toJson(mBean));
-                             onResponse.onSuccess(new UniverSelObjct(mBean, Tags.SB_GET_ALL_V3_LOCKS, "true", ""));
+                             onResponse.onSuccess(new UniverSelObjct((mBean !=null)?mBean:new AllLocksBean(), Links.SB_GET_ALL_V3_LOCKS, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            onResponse.onError(Tags.SB_GET_ALL_V3_LOCKS, mContext.getResources().getString(R.string.something_wrong));
+                            onResponse.onError(Links.SB_GET_ALL_V3_LOCKS, mContext.getResources().getString(R.string.something_wrong));
                         }
                     } else {
-                        onResponse.onError(Tags.SB_GET_ALL_V3_LOCKS, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_GET_ALL_V3_LOCKS, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -367,7 +365,7 @@ public class ApiCall {
             public void onFailure(Call<String> call, Throwable t) {
                 t.printStackTrace();
                 Log.e("asfdas", call.request().toString() + "");
-                onResponse.onError(Tags.SB_GET_ALL_V3_LOCKS, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_GET_ALL_V3_LOCKS, mContext.getResources().getString(R.string.something_wrong));
             }
         });
     }
@@ -383,13 +381,13 @@ public class ApiCall {
                         try {
                             String strResp = new AESHelper().safeDecryption(response.body().toString(), mContext);
                             Log.e("response123", response.body().toString());
-                              onResponse.onSuccess(new UniverSelObjct(strResp, Tags.SB_UPDATE_LOCK_DATA, "true", ""));
+                              onResponse.onSuccess(new UniverSelObjct(strResp, Links.SB_UPDATE_LOCK_DATA, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            onResponse.onError(Tags.SB_UPDATE_LOCK_DATA, mContext.getResources().getString(R.string.something_wrong));
+                            onResponse.onError(Links.SB_UPDATE_LOCK_DATA, mContext.getResources().getString(R.string.something_wrong));
                         }
                     } else {
-                        onResponse.onError(Tags.SB_UPDATE_LOCK_DATA, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_UPDATE_LOCK_DATA, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -400,7 +398,7 @@ public class ApiCall {
             public void onFailure(Call<String> call, Throwable t) {
                 t.printStackTrace();
                 Log.e("asfdas", call.request().toString() + "");
-                onResponse.onError(Tags.SB_UPDATE_LOCK_DATA, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_UPDATE_LOCK_DATA, mContext.getResources().getString(R.string.something_wrong));
             }
         });
     }
@@ -416,13 +414,13 @@ public class ApiCall {
                         try {
                             String strResp = new AESHelper().safeDecryption(response.body().toString(), mContext);
                             Log.e("response123", response.body().toString());
-                             onResponse.onSuccess(new UniverSelObjct(strResp, Tags.SB_UPDATE_LOCK_NAME, "true", ""));
+                             onResponse.onSuccess(new UniverSelObjct(strResp, Links.SB_UPDATE_LOCK_NAME, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            onResponse.onError(Tags.SB_UPDATE_LOCK_NAME, mContext.getResources().getString(R.string.something_wrong));
+                            onResponse.onError(Links.SB_UPDATE_LOCK_NAME, mContext.getResources().getString(R.string.something_wrong));
                         }
                     } else {
-                        onResponse.onError(Tags.SB_UPDATE_LOCK_NAME, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_UPDATE_LOCK_NAME, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -433,7 +431,7 @@ public class ApiCall {
             public void onFailure(Call<String> call, Throwable t) {
                 t.printStackTrace();
                 Log.e("asfdas", call.request().toString() + "");
-                onResponse.onError(Tags.SB_UPDATE_LOCK_NAME, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_UPDATE_LOCK_NAME, mContext.getResources().getString(R.string.something_wrong));
             }
         });
     }
@@ -449,13 +447,13 @@ public class ApiCall {
                         try {
                             String strResp = new AESHelper().safeDecryption(response.body().toString(), mContext);
                             Log.e("response123", response.body().toString());
-                             onResponse.onSuccess(new UniverSelObjct(strResp, Tags.SB_DELETE_LOCK, "true", ""));
+                             onResponse.onSuccess(new UniverSelObjct(strResp, Links.SB_DELETE_LOCK, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            onResponse.onError(Tags.SB_DELETE_LOCK, mContext.getResources().getString(R.string.something_wrong));
+                            onResponse.onError(Links.SB_DELETE_LOCK, mContext.getResources().getString(R.string.something_wrong));
                         }
                     } else {
-                        onResponse.onError(Tags.SB_DELETE_LOCK, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_DELETE_LOCK, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -466,7 +464,7 @@ public class ApiCall {
             public void onFailure(Call<String> call, Throwable t) {
                 t.printStackTrace();
                 Log.e("asfdas", call.request().toString() + "");
-                onResponse.onError(Tags.SB_DELETE_LOCK, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_DELETE_LOCK, mContext.getResources().getString(R.string.something_wrong));
             }
         });
     }
@@ -482,13 +480,13 @@ public class ApiCall {
                         try {
                             String strResp = new AESHelper().safeDecryption(response.body().toString(), mContext);
                             Log.e("response123", response.body().toString());
-                             onResponse.onSuccess(new UniverSelObjct(strResp, Tags.SB_UPDATE_LOCK_NAME, "true", ""));
+                             onResponse.onSuccess(new UniverSelObjct(strResp, Links.SB_UPDATE_LOCK_NAME, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            onResponse.onError(Tags.SB_UPDATE_LOCK_NAME, mContext.getResources().getString(R.string.something_wrong));
+                            onResponse.onError(Links.SB_UPDATE_LOCK_NAME, mContext.getResources().getString(R.string.something_wrong));
                         }
                     } else {
-                        onResponse.onError(Tags.SB_UPDATE_LOCK_NAME, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_UPDATE_LOCK_NAME, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -499,7 +497,7 @@ public class ApiCall {
             public void onFailure(Call<String> call, Throwable t) {
                 t.printStackTrace();
                 Log.e("asfdas", call.request().toString() + "");
-                onResponse.onError(Tags.SB_UPDATE_LOCK_NAME, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_UPDATE_LOCK_NAME, mContext.getResources().getString(R.string.something_wrong));
             }
         });
     }
@@ -514,13 +512,13 @@ public class ApiCall {
                         try {
                             String strResp = new AESHelper().safeDecryption(response.body().toString(), mContext);
                             Log.e("response123", response.body().toString());
-                             onResponse.onSuccess(new UniverSelObjct(strResp, Tags.SB_OPEN_LOCK, strParams[1], ""));
+                             onResponse.onSuccess(new UniverSelObjct(strResp, Links.SB_OPEN_LOCK, strParams[1], ""));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            onResponse.onError(Tags.SB_OPEN_LOCK, mContext.getResources().getString(R.string.something_wrong));
+                            onResponse.onError(Links.SB_OPEN_LOCK, mContext.getResources().getString(R.string.something_wrong));
                         }
                     } else {
-                        onResponse.onError(Tags.SB_OPEN_LOCK, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_OPEN_LOCK, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -531,7 +529,7 @@ public class ApiCall {
             public void onFailure(Call<String> call, Throwable t) {
                 t.printStackTrace();
                 Log.e("asfdas", call.request().toString() + "");
-                onResponse.onError(Tags.SB_OPEN_LOCK, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_OPEN_LOCK, mContext.getResources().getString(R.string.something_wrong));
             }
         });
     }
@@ -557,13 +555,13 @@ public class ApiCall {
                         try {
                             String strResp = response.body().toString();
                             Log.e("response123", response.body().toString());
-                            onResponse.onSuccess(new UniverSelObjct(strResp, Tags.SB_UNLOCK_GATE_UPLOAD, "true", ""));
+                            onResponse.onSuccess(new UniverSelObjct(strResp, Links.SB_UNLOCK_GATE_UPLOAD, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            onResponse.onError(Tags.SB_UNLOCK_GATE_UPLOAD, mContext.getResources().getString(R.string.something_wrong));
+                            onResponse.onError(Links.SB_UNLOCK_GATE_UPLOAD, mContext.getResources().getString(R.string.something_wrong));
                         }
                     } else {
-                        onResponse.onError(Tags.SB_UNLOCK_GATE_UPLOAD, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_UNLOCK_GATE_UPLOAD, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -580,7 +578,7 @@ public class ApiCall {
                     } catch (Exception e) {
                     }
                 }
-                onResponse.onError(Tags.SB_UNLOCK_GATE_UPLOAD, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_UNLOCK_GATE_UPLOAD, mContext.getResources().getString(R.string.something_wrong));
             }
         });
     }
@@ -604,14 +602,14 @@ public class ApiCall {
                         try {
                             Log.e("response123", response.body().toString());
                             String strResp = new AESHelper().safeDecryption(response.body().toString(), mContext);
-                             onResponse.onSuccess(new UniverSelObjct(strResp, Tags.SB_API_SAVE_LOCK_STATUS, "true", ""));
+                             onResponse.onSuccess(new UniverSelObjct(strResp, Links.SB_API_SAVE_LOCK_STATUS, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
                             Log.e("recharge_error","recharge_error : "+e.getMessage());
-                            onResponse.onError(Tags.SB_API_SAVE_LOCK_STATUS, mContext.getResources().getString(R.string.something_wrong));
+                            onResponse.onError(Links.SB_API_SAVE_LOCK_STATUS, mContext.getResources().getString(R.string.something_wrong));
                         }
                     } else {
-                        onResponse.onError(Tags.SB_API_SAVE_LOCK_STATUS, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_API_SAVE_LOCK_STATUS, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -626,7 +624,7 @@ public class ApiCall {
                 } catch (Exception e) {
                 }
                 Log.e("asfdas", call.request().toString() + "");
-                onResponse.onError(Tags.SB_API_SAVE_LOCK_STATUS, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_API_SAVE_LOCK_STATUS, mContext.getResources().getString(R.string.something_wrong));
             }
         });
     }
@@ -650,13 +648,13 @@ public class ApiCall {
                 String json = response.body();
                 if (CommonMethods.isValidString(json)){
                     try {//LockInitResultObj
-                        onResponse.onSuccess(new UniverSelObjct(json, Tags.SB_API_TTLOCK_INIT, "true", ""));
+                        onResponse.onSuccess(new UniverSelObjct(json, Links.SB_API_TTLOCK_INIT, "true", ""));
                     } catch (Exception e) {
                         e.printStackTrace();
-                        onResponse.onError(Tags.SB_API_TTLOCK_INIT, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_API_TTLOCK_INIT, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } else {
-                    onResponse.onError(Tags.SB_API_TTLOCK_INIT, mContext.getResources().getString(R.string.something_wrong));
+                    onResponse.onError(Links.SB_API_TTLOCK_INIT, mContext.getResources().getString(R.string.something_wrong));
                 }
             }
 
@@ -666,7 +664,7 @@ public class ApiCall {
                     SFProgress.hideProgressDialog(mContext);
                 } catch (Exception e) {
                 }
-                onResponse.onError(Tags.SB_API_TTLOCK_INIT, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_API_TTLOCK_INIT, mContext.getResources().getString(R.string.something_wrong));
             }
         });
     }
@@ -690,19 +688,19 @@ public class ApiCall {
 
                 if (CommonMethods.isValidString(json)){
                     try {//LockInitResultObj
-                        onResponse.onSuccess(new UniverSelObjct(json, Tags.SB_API_TTLOCK_UNLOCK_REMOTLY, "true", ""));
+                        onResponse.onSuccess(new UniverSelObjct(json, Links.SB_API_TTLOCK_UNLOCK_REMOTLY, "true", ""));
                     } catch (Exception e) {
                         e.printStackTrace();
-                        onResponse.onError(Tags.SB_API_TTLOCK_UNLOCK_REMOTLY, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_API_TTLOCK_UNLOCK_REMOTLY, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } else {
-                    onResponse.onError(Tags.SB_API_TTLOCK_UNLOCK_REMOTLY, mContext.getResources().getString(R.string.something_wrong));
+                    onResponse.onError(Links.SB_API_TTLOCK_UNLOCK_REMOTLY, mContext.getResources().getString(R.string.something_wrong));
                 }
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                onResponse.onError(Tags.SB_API_TTLOCK_UNLOCK_REMOTLY, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_API_TTLOCK_UNLOCK_REMOTLY, mContext.getResources().getString(R.string.something_wrong));
                 try {
                     SFProgress.hideProgressDialog(mContext);
                 } catch (Exception e) {
@@ -730,14 +728,14 @@ public class ApiCall {
                         try {
                             Log.e("response123", response.body().toString());
                             String strResp = new AESHelper().safeDecryption(response.body().toString(), mContext);
-                            onResponse.onSuccess(new UniverSelObjct(strResp, Tags.SB_API_ADD_NEW_LOCK, "true", ""));
+                            onResponse.onSuccess(new UniverSelObjct(strResp, Links.SB_API_ADD_NEW_LOCK, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
                             Log.e("recharge_error","recharge_error : "+e.getMessage());
-                            onResponse.onError(Tags.SB_API_ADD_NEW_LOCK, mContext.getResources().getString(R.string.something_wrong));
+                            onResponse.onError(Links.SB_API_ADD_NEW_LOCK, mContext.getResources().getString(R.string.something_wrong));
                         }
                     } else {
-                        onResponse.onError(Tags.SB_API_ADD_NEW_LOCK, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_API_ADD_NEW_LOCK, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -752,7 +750,7 @@ public class ApiCall {
                 } catch (Exception e) {
                 }
                 Log.e("asfdas", call.request().toString() + "");
-                onResponse.onError(Tags.SB_API_ADD_NEW_LOCK, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_API_ADD_NEW_LOCK, mContext.getResources().getString(R.string.something_wrong));
             }
         });
     }
@@ -776,14 +774,14 @@ public class ApiCall {
                         try {
                             Log.e("response123", response.body().toString());
                             String strResp = new AESHelper().safeDecryption(response.body().toString(), mContext);
-                            onResponse.onSuccess(new UniverSelObjct(strResp, Tags.SB_API_ADD_NEW_LOCK, "true", ""));
+                            onResponse.onSuccess(new UniverSelObjct(strResp, Links.SB_API_ADD_NEW_LOCK, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
                             Log.e("recharge_error","recharge_error : "+e.getMessage());
-                            onResponse.onError(Tags.SB_API_ADD_NEW_LOCK, mContext.getResources().getString(R.string.something_wrong));
+                            onResponse.onError(Links.SB_API_ADD_NEW_LOCK, mContext.getResources().getString(R.string.something_wrong));
                         }
                     } else {
-                        onResponse.onError(Tags.SB_API_ADD_NEW_LOCK, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_API_ADD_NEW_LOCK, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -798,7 +796,7 @@ public class ApiCall {
                 } catch (Exception e) {
                 }
                 Log.e("asfdas", call.request().toString() + "");
-                onResponse.onError(Tags.SB_API_ADD_NEW_LOCK, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_API_ADD_NEW_LOCK, mContext.getResources().getString(R.string.something_wrong));
             }
         });
     }
@@ -823,13 +821,13 @@ public class ApiCall {
                 String json = response.body();
                 if (CommonMethods.isValidString(json)){
                     try {//LockInitResultObj
-                        onResponse.onSuccess(new UniverSelObjct(json, Tags.SB_API_LOCK_RECORDS_LIST, "true", ""));
+                        onResponse.onSuccess(new UniverSelObjct(json, Links.SB_API_LOCK_RECORDS_LIST, "true", ""));
                     } catch (Exception e) {
                         e.printStackTrace();
-                        onResponse.onError(Tags.SB_API_LOCK_RECORDS_LIST, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_API_LOCK_RECORDS_LIST, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } else {
-                    onResponse.onError(Tags.SB_API_LOCK_RECORDS_LIST, mContext.getResources().getString(R.string.something_wrong));
+                    onResponse.onError(Links.SB_API_LOCK_RECORDS_LIST, mContext.getResources().getString(R.string.something_wrong));
                 }
             }
 
@@ -839,7 +837,7 @@ public class ApiCall {
                     SFProgress.hideProgressDialog(mContext);
                 } catch (Exception e) {
                 }
-                onResponse.onError(Tags.SB_API_LOCK_RECORDS_LIST, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_API_LOCK_RECORDS_LIST, mContext.getResources().getString(R.string.something_wrong));
             }
         });
     }
@@ -862,13 +860,13 @@ public class ApiCall {
                     if (response != null) {
                         try {
                             Log.e("response123", response.body().toString());
-                            onResponse.onSuccess(new UniverSelObjct(response.body().toString(), Tags.SB_API_CHECK_BLUETOOTH_ACCESS, "true", ""));
+                            onResponse.onSuccess(new UniverSelObjct(response.body().toString(), Links.SB_API_CHECK_BLUETOOTH_ACCESS, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            onResponse.onError(Tags.SB_API_CHECK_BLUETOOTH_ACCESS, mContext.getResources().getString(R.string.something_wrong));
+                            onResponse.onError(Links.SB_API_CHECK_BLUETOOTH_ACCESS, mContext.getResources().getString(R.string.something_wrong));
                         }
                     } else {
-                        onResponse.onError(Tags.SB_API_CHECK_BLUETOOTH_ACCESS, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_API_CHECK_BLUETOOTH_ACCESS, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -883,7 +881,7 @@ public class ApiCall {
                 } catch (Exception e) {
                 }
                 Log.e("asfdas", call.request().toString() + "");
-                onResponse.onError(Tags.SB_API_CHECK_BLUETOOTH_ACCESS, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_API_CHECK_BLUETOOTH_ACCESS, mContext.getResources().getString(R.string.something_wrong));
             }
         });
     }

@@ -13,8 +13,8 @@ public class DhanukaMain {
     public DhanukaMain() {
     }
 
-    public static String EncryptUtils(String text, String tokval, String conval) throws Exception {
-        text = text + "&tkv=" + tokval + "&contvals=" + conval;
+    public static String EncryptUtils(String text, String val1, String val2) throws Exception {
+        text = text + "&tkv=" + val1 + "&contvals=" + val2;
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         byte[] keyBytes = new byte[16];
         String key = "caram@GCKS@#^w-@";
@@ -41,8 +41,8 @@ public class DhanukaMain {
         }
     }
 
-    public static String SafeOBuddyEncryptUtils(String text, String tokval, String conval) throws Exception {
-        text = text + "&tkv=" + tokval + "&contvals=" + conval;
+    public static String SafeOBuddyEncryptUtils(String text, String val1, String val2) throws Exception {
+        text = text + "&tkv=" + val1 + "&contvals=" + val2;
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         byte[] keyBytes = new byte[16];
         String key = "safe@GCKS@#^wji@";

@@ -1,6 +1,7 @@
 package com.codersworld.safelib.rest.ttlock;
 
- import com.codersworld.safelib.rest.ApiRequest;
+ import com.codersworld.configs.urls.common.Links;
+  import com.codersworld.configs.rest.ApiRequest;
  import com.google.gson.reflect.TypeToken;
 import com.ttlock.bl.sdk.util.LogUtil;
 
@@ -16,17 +17,13 @@ import retrofit2.Converter;
 import retrofit2.Retrofit;
 
 
-
 public class RetrofitAPIManager {
-//    public static final String SERVER_URL = "https://api.ttlock.com.cn";
-    public static final String SERVER_URL = "https://euapi.ttlock.com";
 
-    //public static final String SERVER_URL = "https://cnapi.ttlock.com";
 
     public static ApiRequest provideClientApi() {
         Retrofit retrofit = new Retrofit.Builder()
                 .client(genericClient())
-                .baseUrl(SERVER_URL)
+                .baseUrl(Links.BASE_URL_TTLOCK)
                 .addConverterFactory(
                         new Converter.Factory() {//Converter转换器
                             @Override
