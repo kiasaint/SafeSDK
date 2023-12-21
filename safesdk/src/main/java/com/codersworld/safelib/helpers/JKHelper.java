@@ -18,6 +18,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 
 import com.codersworld.configs.urls.common.Links;
+import com.codersworld.configs.urls.tt.tt;
 import com.codersworld.safelib.database.DatabaseHelper;
 import com.codersworld.safelib.database.DatabaseManager;
 import com.codersworld.safelib.database.dao.OTPDao;
@@ -204,7 +205,6 @@ public class JKHelper extends Application implements OnResponse<UniverSelObjct> 
     @Override
     public void onSuccess(UniverSelObjct response) {
         try {
-            Log.e("typewr", "success : " + response.getMethodname());
             switch (response.getMethodname()) {
 
                 case Links.SB_OPEN_LOCK:
@@ -234,7 +234,6 @@ public class JKHelper extends Application implements OnResponse<UniverSelObjct> 
                             if (mAccountInfo.getErrcode() == 0) {
                                 mAccountInfo.setMd5Pwd(strPassword);
                                 String str = new Gson().toJson(mAccountInfo);
-                                Log.e("account_info", str);
                                 UserSessions.saveTTAccountInfo(mActivity, str);
                                 if (fromType == 1) {//
                                     // startActivity(Intent(this@LoginActivity, UserLockActivity::class.java))
@@ -278,7 +277,6 @@ public class JKHelper extends Application implements OnResponse<UniverSelObjct> 
 
     @Override
     public void onError(String type, String error) {
-        Log.e("typewr", type + " error : " + error);
         try {
             switch (type) {
                 case Links.SB_OPEN_LOCK:
@@ -322,13 +320,12 @@ public class JKHelper extends Application implements OnResponse<UniverSelObjct> 
         mProgressBar.setCancelable(false);
 
         ApiRequest apiService = RetrofitAPIManager.provideClientApi();
-        String account = "ttlock_shutterlockdemo";//prefs.getPrefsbtAdminUserName();
-        String password = "e10adc3949ba59abbe56e057f20f883e";//DigitUtil.getMD5(prefs.getPrefsbtAdminPass());
+        String account = tt.ttuname;//prefs.getPrefsbtAdminUserName();
+        String password = tt.ttpass;//DigitUtil.getMD5(prefs.getPrefsbtAdminPass());
         String ClientID = "";
         String ClientSecret = "";
         ClientID = Links.TT_CLIENT_ID;
         ClientSecret = Links.TT_CLIENT_SECRET;
-        Log.e("ttlock_auth=" + i, "username=" + account + " ; password=" + UserSessions.getUserInfo(mActivity).getPassword() + " ; md5=" + password);
         Call<String> call = apiService.ttlockAuth(ClientID, ClientSecret, account, password);
         call.enqueue(new Callback<String>() {
             @Override
@@ -338,11 +335,8 @@ public class JKHelper extends Application implements OnResponse<UniverSelObjct> 
                 //pDialog.dismiss();
                 accountInfo = GsonUtil.toObject(json, AccountInfo.class);
                 if (accountInfo != null) {
-                    Log.e("accountInfo", new Gson().toJson(accountInfo));
-                    Log.e("steppp", "1");
                     if (accountInfo.errcode == 0) {
                         accountInfo.setMd5Pwd(password);
-                        Log.e("steppp", "2");
 
                          //makeToast(accountInfo.toString());
                         SharedPreferences sharedPreferences = ctx.getSharedPreferences("accountInfo", MODE_PRIVATE);
@@ -376,11 +370,8 @@ public class JKHelper extends Application implements OnResponse<UniverSelObjct> 
                                 mListener.onAuth(accountInfo);
                             }
                             JKHelper.openCommentDialog(ctx, "Either User is not created for Lock, or the user  is not active, please contact to administration \nThanks");//at : +91-7042741404
-                            Log.e("steppp", "3");
                             // makeToast(accountInfo.errmsg);
-                            Log.e("accountInfo", new Gson().toJson(accountInfo));
                             Toast.makeText(ctx, accountInfo.errmsg, Toast.LENGTH_SHORT).show();
-                            Log.i("RESPONSE", "onResponse: " + accountInfo.errmsg);
                         }
                     }
                 } else {
@@ -392,7 +383,6 @@ public class JKHelper extends Application implements OnResponse<UniverSelObjct> 
                             mListener.onAuth(accountInfo);
                         }
                         JKHelper.openCommentDialog(ctx, "Either User is not created for Lock, or the user  is not active, please contact to administration \nThanks");//at : +91-7042741404
-                        Log.e("steppp", "4");
                         //makeToast(response.message());
                     }
                 }
@@ -410,7 +400,6 @@ public class JKHelper extends Application implements OnResponse<UniverSelObjct> 
                     }
 
                     Toast.makeText(ctx, t.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.e("steppp", t.getMessage());
                     JKHelper.openCommentDialog(ctx, "Either User is not created for Lock, or the user  is not active, please contact to administration \nThanks");//at : +91-7042741404
                     mProgressBar.dismiss();
                     //pDialog.dismiss();

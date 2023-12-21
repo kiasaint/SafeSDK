@@ -625,7 +625,6 @@ public class CommonMethods {
                     mPermission = 1;
                 } else if (mContext.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED || mContext.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
                     mPermission = 0;
-                    Log.e("mPermission", mPermission + " : " + mContext.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) + " : " + mContext.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION));
                 }
             } else {
                 mPermission = 1;
@@ -645,7 +644,6 @@ public class CommonMethods {
                     mPermission = 1;
                 } else if (mContext.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED || mContext.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED || mContext.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED || mContext.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED || mContext.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
                     mPermission = 0;
-                    Log.e("mPermission", mPermission + " : " + mContext.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) + " : " + mContext.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION));
                 }
             } else {
                 mPermission = 1;
@@ -665,7 +663,6 @@ public class CommonMethods {
                     mPermission = 1;
                 } else if (mContext.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED || mContext.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED || mContext.checkSelfPermission(Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_DENIED || mContext.checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED) {
                     mPermission = 0;
-                    Log.e("mPermission", mPermission + " : " + mContext.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) + " : " + mContext.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION));
                 }
             } else {
                 mPermission = 1;
@@ -1132,8 +1129,6 @@ public class CommonMethods {
         return sp * scale;
     }
     public static void signupPolicy(String str,String strTerms,String strPolicy,String strAnd,TextView textView,Context ctx,View.OnClickListener onClickListener,View.OnClickListener onClickListener1) {
-        //textView.setText(str+" "+strTerms+" "+ strAnd+" "+strPolicy+"");
-//Log.e("asdfghj",str+" "+strTerms+" "+ strAnd+" "+strPolicy+".");
         SpannableStringBuilder spanText = new SpannableStringBuilder();
         spanText.append(str);
         spanText.append(strTerms);

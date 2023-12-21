@@ -42,7 +42,7 @@ public class RetrofitRequest {
          }else{
              baseUrl = Links.BASE_URL_MMTHINKBIZ;
          }
-        Log.e("baseUrl1",baseUrl);
+        //Log.e("baseUrl1",baseUrl);
          if (retrofit == null) {
             Gson gson = new GsonBuilder()
                     .setLenient()
@@ -116,7 +116,7 @@ public class RetrofitRequest {
             HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
                 @Override
                 public void log(String message) {
-                    Log.e("ApiResponse", message);
+                    //Log.e("ApiResponse", message);
                 }
             });
             httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -141,7 +141,7 @@ public class RetrofitRequest {
         HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
             @Override
             public void log(String message) {
-                Log.e("ApiResponse", message);
+               // Log.e("ApiResponse", message);
             }
         });
         httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);

@@ -16,7 +16,6 @@ public class AESHelper {
         String token = (mUserSession != null && CommonMethods.isValidString(mUserSession.getAccessToken(context))) ? mUserSession.getAccessToken(context) : "";
         String userid = (mUserSession != null && mUserSession.getUserInfo(context) != null) ? mUserSession.getUserInfo(context).getEmail() : "";
         try {
-            Log.e("before_enc",token+"\n"+strParam);
             strParam = DhanukaMain.SafeOBuddyEncryptUtils(strParam, token, userid);
             return strParam;
         } catch (Exception e) {
@@ -29,7 +28,6 @@ public class AESHelper {
         String responses;
         try {
             responses = DhanukaMain.SafeOBuddyDecryptUtils(response);
-            Log.e("response123",response);
             JSONObject jsonObject = new JSONObject(responses);
             int success = jsonObject.getInt("success");
             if (success == 9999) {

@@ -1,9 +1,9 @@
 package com.codersworld.safelib.rest;
 
 
-public interface DataResponse<T> {
+interface DataResponse<T> {
 
-    void onSuccess(T response);
+      void onSuccess(T response);
 
-    void onFaliure(String error);
+      void onFaliure(String error);
 }

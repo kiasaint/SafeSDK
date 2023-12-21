@@ -13,8 +13,11 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import com.codersworld.configs.urls.common.Constants;
+
+import org.json.JSONObject;
 
 public class UserSessions {
     public static SharedPreferences mPrefs = null;
@@ -111,7 +114,6 @@ public class UserSessions {
         if (mPrefs.getString(Constants.SB_TT_ACCOUNT_INFO, "").isEmpty()) {
             return null;
         } else {
-            Log.e("account_info1", mPrefs.getString(Constants.SB_TT_ACCOUNT_INFO, ""));
             return new Gson().fromJson(mPrefs.getString(Constants.SB_TT_ACCOUNT_INFO, ""), AccountInfo.class);
         }
     }
@@ -138,6 +140,24 @@ public class UserSessions {
     public static String getAction(Context context, String strKey) {
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         return mPrefs.getString(strKey, "");
+    }
+    public static void saveMap(Context context, HashMap<String ,HashMap<String,String>> mMap) {
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = mPrefs.edit();
+        String str =  new Gson().toJson(mMap);
+
+        editor.putString("map", str);
+        editor.commit();
+    }
+
+    public static HashMap<String, HashMap<String, String>> getMap(Context context) {
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String str = mPrefs.getString("map", "");
+        HashMap<String, HashMap<String, String>> mapObj = new HashMap<>();
+        if (!str.isEmpty()){
+         mapObj = new Gson().fromJson(str, new TypeToken<HashMap<String, HashMap<String, String>>>() {}.getType());
+        }
+        return mapObj ;
     }
 
 }

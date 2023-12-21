@@ -123,8 +123,7 @@ public class GuestShutterLockDAO {
                 + COLUMN_btlockid + " TEXT ,"
                 + COLUMN_MainLocktype + " TEXT ,"
                 + COLUMN_KeyId + " TEXT)";
-        Log.e("CREATE_TABLE",CREATE_TABLE);
-        return CREATE_TABLE;
+         return CREATE_TABLE;
     }
 
     public static String getDropTableUpload() {
@@ -443,9 +442,7 @@ public class GuestShutterLockDAO {
 
 
     public int getCurrentAccountsCount(String id) {
-
         Log.e("id in database==" , ""+id);
-
         String[] bindArgs = {
                 id
         };

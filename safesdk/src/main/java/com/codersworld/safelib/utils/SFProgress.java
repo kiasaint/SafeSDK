@@ -19,7 +19,6 @@ public class SFProgress {
     private static ProgressDialog progressDialog;
     public static void showProgressDialog(Activity context,Boolean isCancelable) {
        try {
-           Log.e("contextcontext",context.getLocalClassName()+"");
            if (progressDialog !=null && progressDialog.isShowing()){
                progressDialog.dismiss();
            }
@@ -40,7 +39,6 @@ public class SFProgress {
     public static ProgressDialog showTempProgressDialog(Activity context,Boolean isCancelable) {
         ProgressDialog progressDialog  = ProgressDialog.show(context, null, null, false, isCancelable);
         try {
-           Log.e("contextcontext",context.getLocalClassName()+"");
            if (!((Activity) context).isFinishing()) {
                WeakReference<Context> weakActivity = new WeakReference<>(context);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -57,7 +55,6 @@ public class SFProgress {
     }
     public static void showMsgProgressDialog(Activity context,Boolean isCancelable,String strMsg) {
        try {
-           Log.e("contextcontext",context.getLocalClassName()+"");
            if (progressDialog !=null && progressDialog.isShowing()){
                progressDialog.dismiss();
            }
