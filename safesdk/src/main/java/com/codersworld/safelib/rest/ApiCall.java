@@ -127,19 +127,27 @@ public class ApiCall {
             SFProgress.showProgressDialog(mContext, true);
         } catch (Exception e) {
         }
-        ApiRequest mRequest = RetrofitAPIManager.provideClientApi();
+        ApiRequest mRequest = RetrofitAPIManager.provideClientApi(0);
         //mRequest.getUserKeyList(param).enqueue(
         Call< ResponseBody > call = mRequest.getUserKeyList(param);
         RetrofitAPIManager.enqueue(call,new TypeToken<KeyListObj>() {}, result->{
+            try{
+                Log.e("resultresult",result.success+"\n"+result.getCode()+"\n"+result.getMsg()+"\n"+result.getMsgJson()+"\n"+result.getResult());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
             if (!result.success) {
                 onResponse.onError(Links.SB_API_TTLOCK_USER_KEYLIST, mContext.getResources().getString(R.string.something_wrong));
                 return;
             }else{
                 KeyListObj keyListObj = result.getResult();
+                Log.e("keyListObj",new Gson().toJson(keyListObj));
                 onResponse.onSuccess(new UniverSelObjct(keyListObj, Links.SB_API_TTLOCK_USER_KEYLIST, "true", ""));
             }
 
         }, requestError -> {
+            Log.e("requestError",requestError.getMessage());
+            requestError.printStackTrace();
             onResponse.onError(Links.SB_API_TTLOCK_USER_KEYLIST, mContext.getResources().getString(R.string.something_wrong));
         });
      }
@@ -148,7 +156,7 @@ public class ApiCall {
             SFProgress.showProgressDialog(mContext, true);
         } catch (Exception e) {
         }
-        ApiRequest mRequest = RetrofitAPIManager.provideClientApi();
+        ApiRequest mRequest = RetrofitAPIManager.provideClientApi(0);
         Call<String> call = mRequest.getGatewayList(params[0],params[1],params[2],params[3],params[4]);
 
         call.enqueue(new Callback<String>() {
@@ -174,7 +182,7 @@ public class ApiCall {
             SFProgress.showProgressDialog(mContext, true);
         } catch (Exception e) {
         }
-        ApiRequest mRequest = RetrofitAPIManager.provideClientApi();
+        ApiRequest mRequest = RetrofitAPIManager.provideClientApi(0);
         //mRequest.getUserKeyList(param).enqueue(
         Call< String > call = mRequest.uploadGatewayDetail(params[0],params[1],params[2],params[3],params[4],params[5],params[6],params[7]);
         call.enqueue(new Callback<String>() {
@@ -205,7 +213,7 @@ public class ApiCall {
             SFProgress.showProgressDialog(mContext, true);
         } catch (Exception e) {
         }
-        ApiRequest mRequest = RetrofitAPIManager.provideClientApi();
+        ApiRequest mRequest = RetrofitAPIManager.provideClientApi(0);
         //mRequest.getUserKeyList(param).enqueue(
         Call< String > call = mRequest.renameGateway(params[0],params[1],params[2],params[3],params[4],params[5],params[6],params[7]);
         call.enqueue(new Callback<String>() {
@@ -236,7 +244,7 @@ public class ApiCall {
             SFProgress.showProgressDialog(mContext, true);
         } catch (Exception e) {
         }
-        ApiRequest mRequest = RetrofitAPIManager.provideClientApi();
+        ApiRequest mRequest = RetrofitAPIManager.provideClientApi(0);
         //mRequest.getUserKeyList(param).enqueue(
         Call< String > call = mRequest.renameTTLock(params[0],params[1],params[2],params[3],params[4]);
         call.enqueue(new Callback<String>() {
@@ -267,7 +275,7 @@ public class ApiCall {
             SFProgress.showProgressDialog(mContext, true);
         } catch (Exception e) {
         }
-        ApiRequest mRequest = RetrofitAPIManager.provideClientApi();
+        ApiRequest mRequest = RetrofitAPIManager.provideClientApi(0);
         //mRequest.getUserKeyList(param).enqueue(
         Call< String > call = mRequest.gatewayIsInitSuccess(params[0],params[1],params[2],params[3]);
         call.enqueue(new Callback<String>() {
@@ -607,7 +615,7 @@ public class ApiCall {
             SFProgress.showProgressDialog(mContext, true);
         } catch (Exception e) {
         }
-        ApiRequest mRequest = RetrofitAPIManager.provideClientApi();
+        ApiRequest mRequest = RetrofitAPIManager.provideClientApi(0);
         //mRequest.getUserKeyList(param).enqueue(
         Call< String > call = mRequest.iniTTLock(params[0],params[1],params[2],params[3],params[4]);
         call.enqueue(new Callback<String>() {
@@ -647,7 +655,7 @@ public class ApiCall {
             SFProgress.showProgressDialog(mContext, true);
         } catch (Exception e) {
         }
-        ApiRequest mRequest = RetrofitAPIManager.provideClientApi();
+        ApiRequest mRequest = RetrofitAPIManager.provideClientApi(0);
         //mRequest.getUserKeyList(param).enqueue(
         Call< String > call = mRequest.remotlyUnlockDevice(params[0],params[1],params[2],params[3]);
         call.enqueue(new Callback<String>() {
@@ -774,7 +782,7 @@ public class ApiCall {
             SFProgress.showProgressDialog(mContext, true);
         } catch (Exception e) {
         }
-        ApiRequest mRequest = RetrofitAPIManager.provideClientApi();
+        ApiRequest mRequest = RetrofitAPIManager.provideClientApi(0);
         //mRequest.getUserKeyList(param).enqueue(
         Call< String > call = mRequest.getLockRecords(params[0],params[1],params[2],params[3],params[4],params[5],params[6]);
         call.enqueue(new Callback<String>() {
@@ -851,5 +859,32 @@ public class ApiCall {
         });
     }
 
+    public void getLockData(OnResponse<UniverSelObjct> onResponse,  String... params) {
+        ApiRequest mRequest = RetrofitRequest.getRetrofitInstance(4, 3).create(ApiRequest.class);
+
+//        ApiRequest mRequest = RetrofitAPIManager.provideClientApi(1);
+        Call<String> call = mRequest.getLockData(params[0],params[1],params[2],params[3]);
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response != null) {
+
+                    String json = response.body();
+                    Log.e("jsonjson", json+" = ");
+                }
+               /* if (json.contains("list")) {
+                    onResponse.onSuccess(new UniverSelObjct(json, Links.SB_API_TTLOCK_GET_LOCKDATA, "true", ""));
+                } else {
+                    onResponse.onError(Links.SB_API_TTLOCK_GET_LOCKDATA, mContext.getResources().getString(R.string.something_wrong));
+                }*/
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                onResponse.onError(Links.SB_API_TTLOCK_GET_LOCKDATA, mContext.getResources().getString(R.string.something_wrong));
+            }
+        });
+    }
 
 }

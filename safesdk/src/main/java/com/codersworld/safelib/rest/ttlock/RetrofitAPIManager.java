@@ -20,10 +20,10 @@ import retrofit2.Retrofit;
 public class RetrofitAPIManager {
 
 
-    public static ApiRequest provideClientApi() {
+    public static ApiRequest provideClientApi(int type) {
         Retrofit retrofit = new Retrofit.Builder()
                 .client(genericClient())
-                .baseUrl(Links.BASE_URL_TTLOCK)
+                .baseUrl((type==0)?Links.BASE_URL_TTLOCK:Links.BASE_URL_TTLOCK1)
                 .addConverterFactory(
                         new Converter.Factory() {//Converter转换器
                             @Override
@@ -33,7 +33,7 @@ public class RetrofitAPIManager {
                                     @Override
                                     public String convert(ResponseBody value) throws IOException {
                                         String json = value.string();
-                                        LogUtil.d("json:" + json);
+                                      //  LogUtil.d("json:" + json);
                                         return json;
                                     }
                                 };

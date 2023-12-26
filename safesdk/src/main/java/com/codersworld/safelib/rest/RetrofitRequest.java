@@ -39,6 +39,8 @@ public class RetrofitRequest {
              baseUrl = Links.BASE_URL_MEMBOCOOL;
          }else if(urlType==3){
              baseUrl = Links.BASE_URL_TTLOCK;
+         }else if(urlType==4){
+             baseUrl = Links.BASE_URL_TTLOCK1;
          }else{
              baseUrl = Links.BASE_URL_MMTHINKBIZ;
          }
@@ -72,7 +74,7 @@ public class RetrofitRequest {
                                             @Override
                                             public String convert(ResponseBody value) throws IOException {
                                                 String json = value.string();
-                                                LogUtil.d("json:" + json);
+                                                //LogUtil.d("json:" + json);
                                                 return json;
                                             }
                                         };
@@ -116,7 +118,7 @@ public class RetrofitRequest {
             HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
                 @Override
                 public void log(String message) {
-                    //Log.e("ApiResponse", message);
+                   // Log.e("ApiResponse", message);
                 }
             });
             httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);

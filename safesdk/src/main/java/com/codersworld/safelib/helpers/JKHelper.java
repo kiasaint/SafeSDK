@@ -319,7 +319,7 @@ public class JKHelper extends Application implements OnResponse<UniverSelObjct> 
         mProgressBar.show();
         mProgressBar.setCancelable(false);
 
-        ApiRequest apiService = RetrofitAPIManager.provideClientApi();
+        ApiRequest apiService = RetrofitAPIManager.provideClientApi(0);
         String account = tt.ttuname;//prefs.getPrefsbtAdminUserName();
         String password = tt.ttpass;//DigitUtil.getMD5(prefs.getPrefsbtAdminPass());
         String ClientID = "";
