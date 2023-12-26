@@ -31,11 +31,13 @@ public class SplashActivity extends AppCompatActivity implements OnSafeAuthListe
         mSafeLock = new SafeLock(SplashActivity.this, this);
         //startActivityForResult(new Intent(this, ScanActivity.class).putExtra("open_scanner", true), 102);
         // CommonMethods.successToast(this, AppUrls.GET_UOM_ITEM);
-        mSafeLock.authUser("shutterlock", "123456", "1.0", "Safe SDL demo");
+       // mSafeLock.authUser("shutterlock", "123456", "1.0", "Safe SDL demo");
+        mSafeLock.authUser("uffizio", "uffizio123", "1.0", "Safe SDL demo");
     }
 
     public void onScan(View v) {
-        mSafeLock.authUser("shutterlock", "123456", "1.0", "Safe SDL demo");
+        //mSafeLock.authUser("shutterlock", "123456", "1.0", "Safe SDL demo");
+        mSafeLock.authUser("uffizio", "uffizio123", "1.0", "Safe SDL demo");
     }
 
     @Override
@@ -57,7 +59,7 @@ public class SplashActivity extends AppCompatActivity implements OnSafeAuthListe
                 String startDate = CommonMethods.getCalculatedDate("MM/dd/yyyy", -27);
                 String endDate = CommonMethods.getCurrentFormatedDate("MM/dd/yyyy");
 
-                //mSafeLock.openLock(System.currentTimeMillis(),"9602683");
+                mSafeLock.openLock(System.currentTimeMillis(),"UFFIZIO123");
               //  mSafeLock.openLock(System.currentTimeMillis(),"wifi smart meter");
                 mSafeLock.getDeviceRecords(startDate, endDate, mListLocks.get(0).getDeviceID(), mListLocks.get(0).getVehicleNumber());
             }
@@ -79,6 +81,6 @@ public class SplashActivity extends AppCompatActivity implements OnSafeAuthListe
 
     @Override
     public void onSafeLockAction(String code, String message, String type) {
-
+Log.e("action_lock",code+"\n"+message+"\n"+type);
     }
 }

@@ -78,7 +78,11 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
 
     private static void getInstance(Activity activity) {
         mActivity = activity;
-        myVib = (Vibrator) mActivity.getSystemService(Context.VIBRATOR_SERVICE);
+        try {
+            myVib = (Vibrator) mActivity.getSystemService(Context.VIBRATOR_SERVICE);
+        } catch (Exception e) {
+
+        }
         statusCheck();
         try {
             final BluetoothAdapter bAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -96,7 +100,6 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        iniDateTime = System.currentTimeMillis() + 1800000;
     }
 
     public static void statusCheck() {
@@ -210,6 +213,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                                 if (CommonMethods.isValidArrayList(mAllLocksBean.getNewusercreation())) {
                                     for (int a = 0; a < mAllLocksBean.getNewusercreation().size(); a++) {
                                         HashMap<String, String> mMap1 = new HashMap<>();
+                                        Log.e("device_info=" + mAllLocksBean.getNewusercreation().get(a).getVehicleNumber(), new Gson().toJson(mAllLocksBean.getNewusercreation().get(a)));
                                         mMap1.put("LockData", mAllLocksBean.getNewusercreation().get(a).getLockData());
                                         mMap1.put("MACID", mAllLocksBean.getNewusercreation().get(a).getMACID());
                                         mMap.put(mAllLocksBean.getNewusercreation().get(a).getVehicleNumber(), mMap1);
@@ -334,16 +338,17 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     }
 
     public void closeLock(String deviceName/*String lockData, String macID*/) {
+        iniDateTime = System.currentTimeMillis() + 1800000;
         long unlockdate = System.currentTimeMillis();
-        HashMap<String,String> mMap = validateDevice(deviceName);
-         if(mMap.isEmpty()){
+        HashMap<String, String> mMap = validateDevice(deviceName);
+        if (mMap.isEmpty()) {
             onLockAction("100", "Invalid device info", "close lock");
-        }else if (iniDateTime < unlockdate) {
+        } else if (iniDateTime < unlockdate) {
             onLockAction("100", "Please Refresh Page", "close lock");
             return;
         }
-        String lockData = (mMap.containsKey("LockData"))?mMap.get("LockData"):"";
-        String macID = (mMap.containsKey("MACID"))?mMap.get("MACID"):"";
+        String lockData = (mMap.containsKey("LockData")) ? mMap.get("LockData") : "";
+        String macID = (mMap.containsKey("MACID")) ? mMap.get("MACID") : "";
 
         SFProgress.showProgressDialog(mActivity, true);
         TTLockClient.getDefault().controlLock(ControlAction.LOCK, lockData, macID, new ControlLockCallback() {
@@ -359,7 +364,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
 
             @Override
             public void onFail(LockError error) {
-                 Toast.makeText(mActivity, "Failed To Lock!--" + error.getDescription(), Toast.LENGTH_LONG).show();
+                Toast.makeText(mActivity, "Failed To Lock!--" + error.getDescription(), Toast.LENGTH_LONG).show();
                 onLockAction("100", "Failed to lock the device.", "close lock");
                 SFProgress.hideProgressDialog(mActivity);
             }
@@ -368,17 +373,23 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
 
 
     public void openLock(long unlockdate, String deviceName/*, String lockID, String macID*/) {
-        myVib.vibrate(100);
-        HashMap<String,String> mMap = validateDevice(deviceName);
-         if(mMap.isEmpty()){
+        iniDateTime = System.currentTimeMillis() + 1800000;
+        try {
+            myVib.vibrate(100);
+        } catch (Exception e) {
+
+        }
+        HashMap<String, String> mMap = validateDevice(deviceName);
+        Log.e("mMapmMap", new Gson().toJson(mMap));
+        if (mMap.isEmpty()) {
             onLockAction("100", "Invalid device info", "open lock");
-        }else if (iniDateTime < unlockdate) {
-             onLockAction("100", "Please Refresh Page", "open lock");
+        } else if (iniDateTime < unlockdate) {
+            onLockAction("100", "Please Refresh Page", "open lock");
             return;
         }
-         String lockID = (mMap.containsKey("LockData"))?mMap.get("LockData"):"";
-        String macID = (mMap.containsKey("MACID"))?mMap.get("MACID"):"";
-         SFProgress.showProgressDialog(mActivity, true);
+        String lockID = (mMap.containsKey("LockData")) ? mMap.get("LockData") : "";
+        String macID = (mMap.containsKey("MACID")) ? mMap.get("MACID") : "";
+        SFProgress.showProgressDialog(mActivity, true);
         TTLockClient.getDefault().controlLock(ControlAction.UNLOCK, lockID, macID, new ControlLockCallback() {
             //TTLockClient.getDefault().controlLock(ControlAction.UNLOCK, mMyTestLockEKey.getLockData(), mMyTestLockEKey.getLockMac(), new ControlLockCallback() {
             @Override
@@ -396,9 +407,13 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                         // Toast.makeText(mActivity, error.getDescription(), Toast.LENGTH_SHORT).show();
                     }
                 });
-                if (myVib != null) {
-                    myVib.vibrate(100);
-                }
+                try {
+                    if (myVib != null) {
+                        myVib.vibrate(100);
+                    }
+                } catch (Exception e) {
+
+                }//myVib.vibrate(100);
                 try {
                     onLockAction("106", "Lock opened successfully.", "open lock");
                     //unlockRecordUpload("Opened via APP");
@@ -410,7 +425,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
 
             @Override
             public void onFail(LockError error) {
-                 onLockAction("102", "failed to open the lock.", "open lock");
+                onLockAction("102", "failed to open the lock.", "open lock");
                 try {
                     if (error.getDescription().toLowerCase().contains("key") || error.getDescription().toLowerCase().contains("parameter format or content is incorrect")) {
                         authenticateTTLock();

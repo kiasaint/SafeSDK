@@ -96,7 +96,7 @@ public class DhanukaMain {
             Log.i("Erron in Decryption", var10.toString());
         }
 
-        Log.i("Data", new String(results, "UTF-8"));
+        //Log.i("Data", new String(results, "UTF-8"));
         return new String(results, "UTF-8");
     }
 
@@ -127,7 +127,7 @@ public class DhanukaMain {
             Log.i("Erron in Decryption", var10.toString());
         }
 
-        Log.i("Data", new String(results, "UTF-8"));
+        //Log.i("Data", new String(results, "UTF-8"));
         return new String(results, "UTF-8");
     }
 }
