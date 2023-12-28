@@ -44,7 +44,6 @@ public class RetrofitRequest {
          }else{
              baseUrl = Links.BASE_URL_MMTHINKBIZ;
          }
-        //Log.e("baseUrl1",baseUrl);
          if (retrofit == null) {
             Gson gson = new GsonBuilder()
                     .setLenient()

@@ -164,6 +164,26 @@ public class AllLocksBean implements Serializable {
         String OnlineStatus;
        @SerializedName("owner_id")
         String owner_id;
+       @SerializedName("btlockid")
+        String btlockid;
+       @SerializedName("btlockidval")
+        String btlockidval;
+
+        public String getBtlockid() {
+            return btlockid;
+        }
+
+        public void setBtlockid(String btlockid) {
+            this.btlockid = btlockid;
+        }
+
+        public String getBtlockidval() {
+            return btlockidval;
+        }
+
+        public void setBtlockidval(String btlockidval) {
+            this.btlockidval = btlockidval;
+        }
 
         public String getOwner_id() {
             return owner_id;

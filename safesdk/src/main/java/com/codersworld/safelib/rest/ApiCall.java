@@ -4,7 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.codersworld.configs.urls.common.Links;
+import com.codersworld.safelib.beans.DeviceDetailBean;
 import com.codersworld.safelib.helpers.UserSessions;
 import com.codersworld.safelib.helpers.AESHelper;
  import com.codersworld.safelib. beans.AccountInfo;
@@ -26,6 +32,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import com.codersworld.configs.rest.ApiRequest;
+
+import org.json.JSONObject;
+
 public class ApiCall {
     public Activity mContext = null;
     public UserSessions mUserSessions = null;
@@ -132,7 +141,6 @@ public class ApiCall {
         Call< ResponseBody > call = mRequest.getUserKeyList(param);
         RetrofitAPIManager.enqueue(call,new TypeToken<KeyListObj>() {}, result->{
             try{
-                Log.e("resultresult",result.success+"\n"+result.getCode()+"\n"+result.getMsg()+"\n"+result.getMsgJson()+"\n"+result.getResult());
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -141,12 +149,10 @@ public class ApiCall {
                 return;
             }else{
                 KeyListObj keyListObj = result.getResult();
-                Log.e("keyListObj",new Gson().toJson(keyListObj));
                 onResponse.onSuccess(new UniverSelObjct(keyListObj, Links.SB_API_TTLOCK_USER_KEYLIST, "true", ""));
             }
 
         }, requestError -> {
-            Log.e("requestError",requestError.getMessage());
             requestError.printStackTrace();
             onResponse.onError(Links.SB_API_TTLOCK_USER_KEYLIST, mContext.getResources().getString(R.string.something_wrong));
         });
@@ -376,13 +382,13 @@ public class ApiCall {
                     if (response != null) {
                         try {
                             String strResp = new AESHelper().safeDecryption(response.body().toString(), mContext);
-                              onResponse.onSuccess(new UniverSelObjct(strResp, Links.SB_UPDATE_LOCK_DATA, "true", ""));
+                              onResponse.onSuccess(new UniverSelObjct(strResp, Links.SB_UPDATE_LOCK_DATA_CHILD, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            onResponse.onError(Links.SB_UPDATE_LOCK_DATA, mContext.getResources().getString(R.string.something_wrong));
+                            onResponse.onError(Links.SB_UPDATE_LOCK_DATA_CHILD, mContext.getResources().getString(R.string.something_wrong));
                         }
                     } else {
-                        onResponse.onError(Links.SB_UPDATE_LOCK_DATA, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_UPDATE_LOCK_DATA_CHILD, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -392,7 +398,7 @@ public class ApiCall {
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 t.printStackTrace();
-                onResponse.onError(Links.SB_UPDATE_LOCK_DATA, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_UPDATE_LOCK_DATA_CHILD, mContext.getResources().getString(R.string.something_wrong));
             }
         });
     }
@@ -860,31 +866,62 @@ public class ApiCall {
     }
 
     public void getLockData(OnResponse<UniverSelObjct> onResponse,  String... params) {
-        ApiRequest mRequest = RetrofitRequest.getRetrofitInstance(4, 3).create(ApiRequest.class);
+        StringRequest postRequest = new StringRequest(Request.Method.POST, Links.BASE_URL_TTLOCK1+Links.SB_API_TTLOCK_GET_LOCKDATA,
+                new com.android.volley.Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        String res = response;
+                        try {
+                            JSONObject obj = new JSONObject(response);
+                             if (obj.has("lockData")){
+                                 DeviceDetailBean mBean = new Gson().fromJson(response,DeviceDetailBean.class);
+                                 onResponse.onSuccess(new UniverSelObjct((mBean !=null)?mBean:new DeviceDetailBean(), Links.SB_API_TTLOCK_GET_LOCKDATA, "true", ""));
+                             }else{
+                                onResponse.onError(Links.SB_API_TTLOCK_GET_LOCKDATA, mContext.getResources().getString(R.string.something_wrong));
+                            }
+                      /*      if (obj.has("lockData")){
+                                String electricQuantity = obj.getString("electricQuantity");
+                                String lockData = obj.getString("lockData");
+                                String keyId = obj.getString("keyId");
+                                String lockMac = obj.getString("lockMac");
+                                String noKeyPwd = obj.getString("noKeyPwd");
+                                GuestShutterLockModel mBean1 = checkLockData(guestShutterLockModel);
+                                guestShutterLockModel.setLockData(mBean1.getLockData());
+                                guestShutterLockModel.setMACID(mBean1.getMACID());
+                                hitUpdateLockDataApi(lockData, lockMac, guestShutterLockModel.getBtlockid());
+                                //                                lockOpenProcess(lockData, lockMac);
+                            }*/
 
-//        ApiRequest mRequest = RetrofitAPIManager.provideClientApi(1);
-        Call<String> call = mRequest.getLockData(params[0],params[1],params[2],params[3]);
-
-        call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                if (response != null) {
-
-                    String json = response.body();
-                    Log.e("jsonjson", json+" = ");
+                        } catch (Exception e) {
+                            onResponse.onError(Links.SB_API_TTLOCK_GET_LOCKDATA, mContext.getResources().getString(R.string.something_wrong));
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new com.android.volley.Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        onResponse.onError(Links.SB_API_TTLOCK_GET_LOCKDATA, mContext.getResources().getString(R.string.something_wrong));
+                    }
                 }
-               /* if (json.contains("list")) {
-                    onResponse.onSuccess(new UniverSelObjct(json, Links.SB_API_TTLOCK_GET_LOCKDATA, "true", ""));
-                } else {
-                    onResponse.onError(Links.SB_API_TTLOCK_GET_LOCKDATA, mContext.getResources().getString(R.string.something_wrong));
-                }*/
-            }
-
+        ) {
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                onResponse.onError(Links.SB_API_TTLOCK_GET_LOCKDATA, mContext.getResources().getString(R.string.something_wrong));
+            protected Map<String, String> getParams() {
+                Map<String, String> prms = new HashMap<String, String>();
+                prms.put("accessToken",params[1] );
+                prms.put("lockId", params[2]);
+                prms.put("date", String.valueOf(System.currentTimeMillis()));
+                prms.put("clientId", params[0]);
+                return prms;
             }
-        });
+        };
+
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                60000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        Volley.newRequestQueue(mContext).add(postRequest);
     }
 
 }

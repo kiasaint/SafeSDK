@@ -19,6 +19,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.codersworld.configs.urls.common.Links;
 import com.codersworld.configs.urls.tt.tt;
+import com.codersworld.configs.urls.vehicletrack.membocool;
 import com.codersworld.safelib.database.DatabaseHelper;
 import com.codersworld.safelib.database.DatabaseManager;
 import com.codersworld.safelib.database.dao.OTPDao;
@@ -63,11 +64,11 @@ public class JKHelper extends Application implements OnResponse<UniverSelObjct> 
         LoginBean.InfoBean mBeanUser = UserSessions.getUserInfo(ctx);
         String ClientID = "";
         String ClientSecret = "";
-        String username = "";
-        strPassword = "";
+        String username = tt.ttuname;
+        strPassword = tt.ttpass;
         if (mBeanUser != null) {
-            strPassword = (CommonMethods.isValidString(mBeanUser.getBtmailpwd())) ? DigitUtil.getMD5(mBeanUser.getBtmailpwd()) : "";
-            username = (CommonMethods.isValidString(mBeanUser.getBtmainuserId())) ? mBeanUser.getBtmainuserId() : "";
+            strPassword = (CommonMethods.isValidString(mBeanUser.getBtmailpwd())) ? DigitUtil.getMD5(mBeanUser.getBtmailpwd()) : tt.ttpass;
+            username = (CommonMethods.isValidString(mBeanUser.getBtmainuserId())) ? mBeanUser.getBtmainuserId() : tt.ttuname;
             ClientID = (CommonMethods.isValidString(mBeanUser.getClientid())) ? mBeanUser.getClientid() : Links.TT_CLIENT_ID;
             ClientSecret = (CommonMethods.isValidString(mBeanUser.getClientsecret())) ? mBeanUser.getClientsecret() : Links.TT_CLIENT_SECRET;
         }
@@ -114,6 +115,12 @@ public class JKHelper extends Application implements OnResponse<UniverSelObjct> 
             String encParam = mAESHelper.safeEncryption(ctx, params);
             new ApiCall(ctx).uploadGeneratedOTP(this, encParam, mOTP.getId() + "");
         }
+    }
+    public void updateLockData(Activity ctx,String lockData,String lockMac, String lockId) {
+        this.mActivity = ctx;
+        AESHelper mAESHelper = new AESHelper();
+        String encParam = mAESHelper.safeEncryption(mActivity, membocool.getUpdateDataParams(lockData, lockMac, lockId,UserSessions.getUserInfo(mActivity).getUsername()));
+        new ApiCall(ctx).updateLockData(this, encParam);
     }
 
 

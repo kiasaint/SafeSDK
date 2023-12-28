@@ -19,6 +19,7 @@ import androidx.core.app.ActivityCompat;
 import com.codersworld.configs.urls.common.Links;
 import com.codersworld.configs.urls.tt.tt;
 import com.codersworld.configs.urls.vehicletrack.membocool;
+import com.codersworld.safelib.beans.DeviceDetailBean;
 import com.codersworld.safelib.beans.KeyListObj;
 import com.codersworld.safelib.helpers.AESHelper;
 import com.codersworld.safelib.helpers.JKHelper;
@@ -55,8 +56,8 @@ import com.codersworld.configs.urls.common.Constants;
 
 public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     static Activity mActivity;
-     static long iniDateTime;
-    static String deviceName;
+    static long iniDateTime;
+    static String deviceCode;
     static String strLat = "0.0";
     static String strLong = "0.0";
     static ApiCall mApiCall = null;
@@ -118,8 +119,9 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         final AlertDialog alert = builder.create();
         alert.show();
     }
-
+String strUsername="";
     public void authUser(String strUsername, String strPassword, String strAppVersion, String strAppName) {
+        this.strUsername = strUsername;
         initApiCall();
         new UserSessions().saveAccessToken(mActivity, "");
 
@@ -183,6 +185,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                         if (mLoginBean.getSuccess() == 1) {
                             UserSessions.saveAccessToken(mActivity, (CommonMethods.isValidString(mLoginBean.getLoginvalidation().get(0).getToken())) ? mLoginBean.getLoginvalidation().get(0).getToken() : "");
                             if (CommonMethods.isValidString(mLoginBean.getLoginvalidation().get(0).getUid()) && !mLoginBean.getLoginvalidation().get(0).getUid().equalsIgnoreCase("0")) {
+                                mLoginBean.getLoginvalidation().get(0).setUsername(strUsername);
                                 UserSessions.saveUserInfo(mActivity, mLoginBean.getLoginvalidation().get(0));
                                 new JKHelper().makeTTAuthentication(mActivity, 4, this);
                                 //moveToNext(mLoginBean.getLoginvalidation().get(0));
@@ -214,13 +217,18 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                                         mMap1.put("MACID", mAllLocksBean.getNewusercreation().get(a).getMACID());
                                         mMap1.put("LOCK_CODE", mAllLocksBean.getNewusercreation().get(a).getDeviceCode());
                                         mMap1.put("LOCK_ID", mAllLocksBean.getNewusercreation().get(a).getDeviceID());
-                                        mMap.put(mAllLocksBean.getNewusercreation().get(a).getVehicleNumber(), mMap1);
+                                        mMap1.put("btlockid", mAllLocksBean.getNewusercreation().get(a).getBtlockid());
+                                        mMap1.put("btlockidval", mAllLocksBean.getNewusercreation().get(a).getBtlockidval());
+                                        mMap.put(mAllLocksBean.getNewusercreation().get(a).getBtlockidval(), mMap1);
                                         mAllLocksBean.getNewusercreation().get(a).setMACID("");
                                         mAllLocksBean.getNewusercreation().get(a).setLockData("");
+                                        mAllLocksBean.getNewusercreation().get(a).setDeviceCode(mAllLocksBean.getNewusercreation().get(a).getBtlockidval());
+                                        mAllLocksBean.getNewusercreation().get(a).setBtlockid("");
+                                        mAllLocksBean.getNewusercreation().get(a).setBtlockidval("");
                                         mAllLocksBean.getNewusercreation().get(a).setOwner_id(UserSessions.getUserInfo(mActivity).getUid());
                                     }
                                     UserSessions.saveMap(mActivity, (mMap.size() > 0) ? mMap : new HashMap<String, HashMap<String, String>>());
-                                    onSafeDevices("106","success", mAllLocksBean.getNewusercreation());
+                                    onSafeDevices("106", "success", mAllLocksBean.getNewusercreation());
                                 } else {
                                     //no data found
                                     onSafeDevices("103", mActivity.getString(R.string.something_wrong), null);
@@ -275,15 +283,33 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                         ex1.printStackTrace();
                     }
                     break;
-                case Links.SB_API_TTLOCK_USER_KEYLIST:
+                case Links.SB_API_TTLOCK_GET_LOCKDATA:
                     try {
-                        KeyListObj mAllLocksBean = (KeyListObj) response.getResponse();
-                        if (mAllLocksBean != null) {
-                            //Log.e("KeyListObj",new Gson().toJson(mAllLocksBean));
+                        DeviceDetailBean mDeviceDetailBean = (DeviceDetailBean) response.getResponse();
+                        if (mDeviceDetailBean != null) {
+                            HashMap<String, HashMap<String, String>> mMap2 = new HashMap<>();
+                            mMap2 = UserSessions.getMap(mActivity);
+                            if (mMap2.containsKey(deviceCode)) {
+                                HashMap<String, String> mMap3 = mMap2.get(deviceCode);
+                                mMap3.put("LockData", mDeviceDetailBean.getLockData());
+                                mMap3.put("MACID", mDeviceDetailBean.getLockMac());
+                                mMap3.put("LOCK_CODE", mMap3.get("LOCK_CODE"));
+                                mMap3.put("LOCK_ID", mMap3.get("LOCK_ID"));
+                                mMap3.put("btlockid", mMap3.get("btlockid"));
+                                mMap3.put("btlockidval", mMap3.get("btlockidval"));
+                                mMap2.put(deviceCode, mMap3);
+                                UserSessions.saveMap(mActivity, mMap2);
+                                if (actionType == 1) {
+                                    openLock(System.currentTimeMillis(), deviceCode);
+                                } else if (actionType == 0) {
+                                    closeLock(deviceCode);
+                                }
+                                new JKHelper().updateLockData(mActivity, mDeviceDetailBean.getLockData(), mDeviceDetailBean.getLockMac(), mDeviceDetailBean.getLockId());
+                            }
                         }
 
                     } catch (Exception ex1) {
-                         ex1.printStackTrace();
+                        ex1.printStackTrace();
                     }
                     break;
             }
@@ -291,6 +317,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
             onAuthResult("100", mActivity.getString(R.string.error_internet));
         }
     }
+
 
     private void onSafeDevices(String code, String msg, ArrayList<AllLocksBean.InfoBean> mListLocks) {
         if (mAuthListener != null) {
@@ -351,137 +378,152 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         onAuthResult("106", mActivity.getString(R.string.login_success));
     }
 
-    public void closeLock(String deviceName/*String lockData, String macID*/) {
-        this.deviceName = deviceName;
+    int actionType = -1;
+
+    public void closeLock(String deviceCode/*String lockData, String macID*/) {
+        actionType = 0;
+        this.deviceCode = deviceCode;
         iniDateTime = System.currentTimeMillis() + 1800000;
         long unlockdate = System.currentTimeMillis();
-        HashMap<String, String> mMap = validateDevice(deviceName);
+        HashMap<String, String> mMap = validateDevice(deviceCode);
         if (mMap.isEmpty()) {
             onLockAction("100", "Invalid device info", "close lock");
         } else if (iniDateTime < unlockdate) {
             onLockAction("100", "Please Refresh Page", "close lock");
             return;
         }
+
         String lockData = (mMap.containsKey("LockData")) ? mMap.get("LockData") : "";
         String macID = (mMap.containsKey("MACID")) ? mMap.get("MACID") : "";
         String LOCK_CODE = (mMap.containsKey("LOCK_CODE")) ? mMap.get("LOCK_CODE") : "";
         String LOCK_ID = (mMap.containsKey("LOCK_ID")) ? mMap.get("LOCK_ID") : "";
+        String btlockid = (mMap.containsKey("btlockid")) ? mMap.get("btlockid") : "";
+        if (!CommonMethods.isValidString(lockData) || !CommonMethods.isValidString(macID)) {
+            getLockData(btlockid);
+        } else {
+            SFProgress.showProgressDialog(mActivity, true);
+            TTLockClient.getDefault().controlLock(ControlAction.LOCK, lockData, macID, new ControlLockCallback() {
+                @Override
+                public void onControlLockSuccess(ControlLockResult controlLockResult) {
+                    Toast.makeText(mActivity, "lock is locked!", Toast.LENGTH_LONG).show();
+                    onLockAction("106", "Device is locked successfully.", "close lock");
 
+                    //unlockRecordUpload("Locked via App");
+                    SFProgress.hideProgressDialog(mActivity);
 
-        SFProgress.showProgressDialog(mActivity, true);
-        TTLockClient.getDefault().controlLock(ControlAction.LOCK, lockData, macID, new ControlLockCallback() {
-            @Override
-            public void onControlLockSuccess(ControlLockResult controlLockResult) {
-                Toast.makeText(mActivity, "lock is locked!", Toast.LENGTH_LONG).show();
-                onLockAction("106", "Device is locked successfully.", "close lock");
+                }
 
-                //unlockRecordUpload("Locked via App");
-                SFProgress.hideProgressDialog(mActivity);
-
-            }
-
-            @Override
-            public void onFail(LockError error) {
-                Toast.makeText(mActivity, "Failed To Lock!--" + error.getDescription(), Toast.LENGTH_LONG).show();
-                onLockAction("100", "Failed to lock the device.", "close lock");
-                SFProgress.hideProgressDialog(mActivity);
-            }
-        });
+                @Override
+                public void onFail(LockError error) {
+                    Toast.makeText(mActivity, "Failed To Lock!--" + error.getDescription(), Toast.LENGTH_LONG).show();
+                    onLockAction("100", "Failed to lock the device.", "close lock");
+                    SFProgress.hideProgressDialog(mActivity);
+                }
+            });
+        }
     }
 
 
-    public void openLock(long unlockdate, String deviceName/*, String lockID, String macID*/) {
-        this.deviceName = deviceName;
+    public void openLock(long unlockdate, String deviceCode/*, String lockID, String macID*/) {
+        this.deviceCode = deviceCode;
         iniDateTime = System.currentTimeMillis() + 1800000;
-        HashMap<String, String> mMap = validateDevice(deviceName);
-         if (mMap.isEmpty()) {
+        HashMap<String, String> mMap = validateDevice(deviceCode);
+        if (mMap.isEmpty()) {
             onLockAction("100", "Invalid device info", "open lock");
         } else if (iniDateTime < unlockdate) {
             onLockAction("100", "Please Refresh Page", "open lock");
             return;
         }
-
-        String lockData = (mMap.containsKey("LockData")) ? mMap.get("LockData") : "";
-        String macID = (mMap.containsKey("MACID")) ? mMap.get("MACID") : "";
-        String LOCK_CODE = (mMap.containsKey("LOCK_CODE")) ? mMap.get("LOCK_CODE") : "";
+        String lockData = (actionType==-1)?"":(mMap.containsKey("LockData")) ? mMap.get("LockData") : "";
+        String macID = (actionType==-1)?"":(mMap.containsKey("MACID")) ? mMap.get("MACID") : "";
+         String LOCK_CODE = (mMap.containsKey("LOCK_CODE")) ? mMap.get("LOCK_CODE") : "";
         String LOCK_ID = (mMap.containsKey("LOCK_ID")) ? mMap.get("LOCK_ID") : "";
+        String btlockid = (mMap.containsKey("btlockid")) ? mMap.get("btlockid") : "";
+         actionType = 1;
 
-         SFProgress.showProgressDialog(mActivity, true);
-        TTLockClient.getDefault().controlLock(ControlAction.UNLOCK, lockData, macID, new ControlLockCallback() {
-            //TTLockClient.getDefault().controlLock(ControlAction.UNLOCK, mMyTestLockEKey.getLockData(), mMyTestLockEKey.getLockMac(), new ControlLockCallback() {
-            @Override
-            public void onControlLockSuccess(ControlLockResult controlLockResult) {
-                Log.i("Safe Lock", "onControlLockSuccess: " + controlLockResult.controlAction);
-                SFProgress.hideProgressDialog(mActivity);
-                TTLockClient.getDefault().getBatteryLevel(lockData, macID, new GetBatteryLevelCallback() {
-                    @Override
-                    public void onGetBatteryLevelSuccess(int electricQuantity) {
-                        // Toast.makeText(mActivity, "lock battery is " + electricQuantity + "%", Toast.LENGTH_SHORT).show();
+        if (!CommonMethods.isValidString(lockData) || !CommonMethods.isValidString(macID)) {
+            getLockData(btlockid);
+        } else {
+            SFProgress.showProgressDialog(mActivity, true);
+            TTLockClient.getDefault().controlLock(ControlAction.UNLOCK, lockData, macID, new ControlLockCallback() {
+                //TTLockClient.getDefault().controlLock(ControlAction.UNLOCK, mMyTestLockEKey.getLockData(), mMyTestLockEKey.getLockMac(), new ControlLockCallback() {
+                @Override
+                public void onControlLockSuccess(ControlLockResult controlLockResult) {
+                    Log.i("Safe Lock", "onControlLockSuccess: " + controlLockResult.controlAction);
+                    SFProgress.hideProgressDialog(mActivity);
+                    TTLockClient.getDefault().getBatteryLevel(lockData, macID, new GetBatteryLevelCallback() {
+                        @Override
+                        public void onGetBatteryLevelSuccess(int electricQuantity) {
+                            // Toast.makeText(mActivity, "lock battery is " + electricQuantity + "%", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onFail(LockError error) {
+                            // Toast.makeText(mActivity, error.getDescription(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    try {
+                        onLockAction("106", "Lock opened successfully.", "open lock");
+                        //unlockRecordUpload("Opened via APP");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        onLockAction("101", mActivity.getString(R.string.something_wrong), "open lock");
                     }
-
-                    @Override
-                    public void onFail(LockError error) {
-                        // Toast.makeText(mActivity, error.getDescription(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-                try {
-                    onLockAction("106", "Lock opened successfully.", "open lock");
-                    //unlockRecordUpload("Opened via APP");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    onLockAction("101", mActivity.getString(R.string.something_wrong), "open lock");
                 }
-            }
 
-            @Override
-            public void onFail(LockError error) {
-                onLockAction("102", "failed to open the lock.", "open lock");
-                try {
-                    if (error.getDescription().toLowerCase().contains("key") || error.getDescription().toLowerCase().contains("parameter format or content is incorrect")) {
-                        authenticateTTLock();
+                @Override
+                public void onFail(LockError error) {
+                    onLockAction("102", "failed to open the lock.", "open lock");
+                    try {
+                        if (error.getDescription().toLowerCase().contains("key") || error.getDescription().toLowerCase().contains("parameter format or content is incorrect")) {
+                            authenticateTTLock();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    SFProgress.hideProgressDialog(mActivity);
+                    //unlockRecordUpload("Failed via APP");
                 }
-                SFProgress.hideProgressDialog(mActivity);
-                //unlockRecordUpload("Failed via APP");
-            }
-        });
+            });
+        }
     }
 
-    private void getLockData(String lock_code){
+    private void getLockData(String lock_code) {
         initApiCall();
         LoginBean.InfoBean mBeanUser = UserSessions.getUserInfo(mActivity);
         AccountInfo mBeanAccountInfo = UserSessions.getTTAccountInfo(mActivity);
         String ClientID = Links.TT_CLIENT_ID;
+        String client_secret = Links.TT_CLIENT_SECRET;
         String accessToken = "";
         if (mBeanUser != null) {
+            client_secret = (CommonMethods.isValidString(mBeanUser.getClientsecret())) ? mBeanUser.getClientsecret() : Links.TT_CLIENT_SECRET;
             ClientID = (CommonMethods.isValidString(mBeanUser.getClientid())) ? mBeanUser.getClientid() : Links.TT_CLIENT_ID;
         }
         if (mBeanAccountInfo != null) {
-            accessToken =   (CommonMethods.isValidString(mBeanAccountInfo.getAccess_token()))? mBeanAccountInfo.getAccess_token(): "";
+            accessToken = (CommonMethods.isValidString(mBeanAccountInfo.getAccess_token())) ? mBeanAccountInfo.getAccess_token() : "";
         }
 
+
         HashMap param = new HashMap<String, String>();
-        param.put("clientId",ClientID) ;
-        param.put("accessToken",accessToken) ;
-        param.put("pageNo",1) ;
-        param.put("pageSize",10000) ;
-        param.put("date",System.currentTimeMillis()+"") ;
-         mApiCall.getUserKeyList(this, param);
-        //mApiCall.getLockData(this, ClientID,accessToken,lock_code,System.currentTimeMillis()+"");
+        param.put("client_secret", client_secret);
+        param.put("clientId", ClientID);
+        param.put("accessToken", accessToken);
+        param.put("lockId", lock_code);
+        param.put("date", System.currentTimeMillis() + "");
+        //mApiCall.getUserKeyList(this, param);
+        mApiCall.getLockData(this, ClientID, accessToken, lock_code, System.currentTimeMillis() + "");
     }
 
     private void authenticateTTLock() {
         new JKHelper().makeTTAuthentication(mActivity, 4, (OnAuthListener) mActivity);
     }
 
-    private HashMap validateDevice(String deviceName) {
+    private HashMap validateDevice(String deviceCode) {
         HashMap<String, HashMap<String, String>> mMap2 = new HashMap<>();
         mMap2 = UserSessions.getMap(mActivity);
-        if (mMap2.containsKey(deviceName)) {
-            return mMap2.get(deviceName);
+        if (mMap2.containsKey(deviceCode)) {
+            return mMap2.get(deviceCode);
         } else {
             return new HashMap();
         }
