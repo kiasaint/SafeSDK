@@ -388,7 +388,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         actionLock();
     }
 
-    private void actionLock() {
+    protected void actionLock() {
         iniDateTime = System.currentTimeMillis() + 1800000;
         long unlockdate = System.currentTimeMillis();
         HashMap<String, String> mMap = validateDevice(deviceCode);
@@ -448,60 +448,6 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         this.deviceCode = deviceCode;
         actionType = 1;
         actionLock();
-       /* iniDateTime = System.currentTimeMillis() + 1800000;
-        HashMap<String, String> mMap = validateDevice(deviceCode);
-        if (mMap.isEmpty()) {
-            onLockAction("100", "Invalid device info", "open lock");
-        } else if (iniDateTime < unlockdate) {
-            onLockAction("100", "Please Refresh Page", "open lock");
-            return;
-        }
-        String lockData = (mMap.containsKey("LockData")) ? mMap.get("LockData") : "";
-        String macID = (mMap.containsKey("MACID")) ? mMap.get("MACID") : "";
-        String LOCK_CODE = (mMap.containsKey("LOCK_CODE")) ? mMap.get("LOCK_CODE") : "";
-        String LOCK_ID = (mMap.containsKey("LOCK_ID")) ? mMap.get("LOCK_ID") : "";
-        String btlockid = (mMap.containsKey("btlockid")) ? mMap.get("btlockid") : "";
-
-        if (!CommonMethods.isValidString(lockData) || !CommonMethods.isValidString(macID)) {
-            getLockData(btlockid);
-        } else {
-            SFProgress.showProgressDialog(mActivity, true);
-            TTLockClient.getDefault().controlLock(ControlAction.UNLOCK, lockData, macID, new ControlLockCallback() {
-                //TTLockClient.getDefault().controlLock(ControlAction.UNLOCK, mMyTestLockEKey.getLockData(), mMyTestLockEKey.getLockMac(), new ControlLockCallback() {
-                @Override
-                public void onControlLockSuccess(ControlLockResult controlLockResult) {
-                    Log.i("Safe Lock", "onControlLockSuccess: " + controlLockResult.controlAction);
-                    SFProgress.hideProgressDialog(mActivity);
-                    TTLockClient.getDefault().getBatteryLevel(lockData, macID, new GetBatteryLevelCallback() {
-                        @Override
-                        public void onGetBatteryLevelSuccess(int electricQuantity) {
-                            // Toast.makeText(mActivity, "lock battery is " + electricQuantity + "%", Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void onFail(LockError error) {
-                            // Toast.makeText(mActivity, error.getDescription(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-
-                }
-
-                @Override
-                public void onFail(LockError error) {
-                    onLockAction("102", "failed to open the lock.", "open lock");
-                    try {
-                        if (error.getDescription().toLowerCase().contains("key") || error.getDescription().toLowerCase().contains("parameter format or content is incorrect")) {
-                            authenticateTTLock();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    SFProgress.hideProgressDialog(mActivity);
-                    //unlockRecordUpload("Failed via APP");
-                }
-            });
-        }*/
     }
 
     private void getLockData(String lock_code) {
