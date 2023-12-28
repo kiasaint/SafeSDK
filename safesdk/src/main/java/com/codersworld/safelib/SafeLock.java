@@ -119,7 +119,9 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         final AlertDialog alert = builder.create();
         alert.show();
     }
-String strUsername="";
+
+    String strUsername = "";
+
     public void authUser(String strUsername, String strPassword, String strAppVersion, String strAppName) {
         this.strUsername = strUsername;
         initApiCall();
@@ -383,13 +385,17 @@ String strUsername="";
     public void closeLock(String deviceCode/*String lockData, String macID*/) {
         actionType = 0;
         this.deviceCode = deviceCode;
+        actionLock();
+    }
+
+    private void actionLock() {
         iniDateTime = System.currentTimeMillis() + 1800000;
         long unlockdate = System.currentTimeMillis();
         HashMap<String, String> mMap = validateDevice(deviceCode);
         if (mMap.isEmpty()) {
-            onLockAction("100", "Invalid device info", "close lock");
+            onLockAction("100", "Invalid device info", (actionType == 0) ? "close lock" : "open lock");
         } else if (iniDateTime < unlockdate) {
-            onLockAction("100", "Please Refresh Page", "close lock");
+            onLockAction("100", "Please Refresh Page", (actionType == 0) ? "close lock" : "open lock");
             return;
         }
 
@@ -402,12 +408,24 @@ String strUsername="";
             getLockData(btlockid);
         } else {
             SFProgress.showProgressDialog(mActivity, true);
-            TTLockClient.getDefault().controlLock(ControlAction.LOCK, lockData, macID, new ControlLockCallback() {
+            TTLockClient.getDefault().controlLock((actionType == 0) ? ControlAction.LOCK : ControlAction.UNLOCK, lockData, macID, new ControlLockCallback() {
                 @Override
                 public void onControlLockSuccess(ControlLockResult controlLockResult) {
-                    Toast.makeText(mActivity, "lock is locked!", Toast.LENGTH_LONG).show();
-                    onLockAction("106", "Device is locked successfully.", "close lock");
-
+                    try {
+                        if (actionType == 0) {
+                            onLockAction("106", "Device is locked successfully.", "close lock");
+                        } else {
+                            onLockAction("106", "Lock opened successfully.", "open lock");
+                        }
+                        //unlockRecordUpload("Opened via APP");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        if (actionType == 0) {
+                            onLockAction("101", mActivity.getString(R.string.something_wrong), "close lock");
+                        } else {
+                            onLockAction("102", mActivity.getString(R.string.something_wrong), "open lock");
+                        }
+                    }
                     //unlockRecordUpload("Locked via App");
                     SFProgress.hideProgressDialog(mActivity);
 
@@ -415,18 +433,22 @@ String strUsername="";
 
                 @Override
                 public void onFail(LockError error) {
-                    Toast.makeText(mActivity, "Failed To Lock!--" + error.getDescription(), Toast.LENGTH_LONG).show();
-                    onLockAction("100", "Failed to lock the device.", "close lock");
+                    if (actionType == 0) {
+                        onLockAction("100", "Failed to lock the device.", "close lock");
+                    } else {
+                        onLockAction("102", "failed to open the lock.", "open lock");
+                    }
                     SFProgress.hideProgressDialog(mActivity);
                 }
             });
         }
     }
 
-
-    public void openLock(long unlockdate, String deviceCode/*, String lockID, String macID*/) {
+    public void openLock(long unlockdate, String deviceCode) {
         this.deviceCode = deviceCode;
-        iniDateTime = System.currentTimeMillis() + 1800000;
+        actionType = 1;
+        actionLock();
+       /* iniDateTime = System.currentTimeMillis() + 1800000;
         HashMap<String, String> mMap = validateDevice(deviceCode);
         if (mMap.isEmpty()) {
             onLockAction("100", "Invalid device info", "open lock");
@@ -434,12 +456,11 @@ String strUsername="";
             onLockAction("100", "Please Refresh Page", "open lock");
             return;
         }
-        String lockData = (actionType==-1)?"":(mMap.containsKey("LockData")) ? mMap.get("LockData") : "";
-        String macID = (actionType==-1)?"":(mMap.containsKey("MACID")) ? mMap.get("MACID") : "";
-         String LOCK_CODE = (mMap.containsKey("LOCK_CODE")) ? mMap.get("LOCK_CODE") : "";
+        String lockData = (mMap.containsKey("LockData")) ? mMap.get("LockData") : "";
+        String macID = (mMap.containsKey("MACID")) ? mMap.get("MACID") : "";
+        String LOCK_CODE = (mMap.containsKey("LOCK_CODE")) ? mMap.get("LOCK_CODE") : "";
         String LOCK_ID = (mMap.containsKey("LOCK_ID")) ? mMap.get("LOCK_ID") : "";
         String btlockid = (mMap.containsKey("btlockid")) ? mMap.get("btlockid") : "";
-         actionType = 1;
 
         if (!CommonMethods.isValidString(lockData) || !CommonMethods.isValidString(macID)) {
             getLockData(btlockid);
@@ -463,13 +484,7 @@ String strUsername="";
                         }
                     });
 
-                    try {
-                        onLockAction("106", "Lock opened successfully.", "open lock");
-                        //unlockRecordUpload("Opened via APP");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        onLockAction("101", mActivity.getString(R.string.something_wrong), "open lock");
-                    }
+
                 }
 
                 @Override
@@ -486,7 +501,7 @@ String strUsername="";
                     //unlockRecordUpload("Failed via APP");
                 }
             });
-        }
+        }*/
     }
 
     private void getLockData(String lock_code) {
