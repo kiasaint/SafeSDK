@@ -66,7 +66,6 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     HashMap<String, HashMap<String, String>> mMap = new HashMap<>();
 
 
-
     public SafeLock(Activity activity, OnSafeAuthListener listener) {
         this.mActivity = activity;
         this.mAuthListener = listener;
