@@ -65,6 +65,8 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     SQLiteDatabase database = null;
     HashMap<String, HashMap<String, String>> mMap = new HashMap<>();
 
+
+
     public SafeLock(Activity activity, OnSafeAuthListener listener) {
         this.mActivity = activity;
         this.mAuthListener = listener;

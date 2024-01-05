@@ -33,7 +33,8 @@ public class SplashActivity extends AppCompatActivity implements OnSafeAuthListe
         // CommonMethods.successToast(this, AppUrls.GET_UOM_ITEM);
        // mSafeLock.authUser("shutterlock", "123456", "1.0", "Safe SDL demo");
         mSafeLock.authUser("uffizio", "uffizio123", "1.0", "Safe SDL demo");
-    }
+       // mSafeLock.authUser("uffizio", "uffizio123", "1.0", "Safe SDL demo");
+     }
 
     public void onScan(View v) {
         //mSafeLock.authUser("shutterlock", "123456", "1.0", "Safe SDL demo");

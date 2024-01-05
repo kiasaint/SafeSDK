@@ -25,9 +25,10 @@ public class AESHelper {
     }
 
     public String safeDecryption(String response, final Activity context) {
-        String responses;
+        String responses = "";
         try {
             responses = DhanukaMain.SafeOBuddyDecryptUtils(response);
+            Log.e("responses12",responses);
             JSONObject jsonObject = new JSONObject(responses);
             int success = jsonObject.getInt("success");
             if (success == 9999) {
@@ -40,7 +41,7 @@ public class AESHelper {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "";
+        return responses;
     }
 
 }
