@@ -64,8 +64,7 @@ public class ApiCall {
                         try {
                             String strResp = new AESHelpers().safeDecryption(response.body().toString(), mContext);
 
-                             //LoginBean mBean = new Gson().fromJson(strResp, LoginBean.class);
-                             LoginBean mBean = new LoginGson().fromJson(strResp);
+                             LoginBean mBean = new Gson().fromJson(strResp, LoginBean.class);
                              onResponse.onSuccess(new UniverSelObjct(mBean, Links.SB_LOGIN_API, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
