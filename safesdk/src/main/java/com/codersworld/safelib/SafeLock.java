@@ -392,6 +392,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     protected void actionLock() {
         iniDateTime = System.currentTimeMillis() + 1800000;
         long unlockdate = System.currentTimeMillis();
+        Log.e("deviceCodeasd",deviceCode);
         HashMap<String, String> mMap = validateDevice(deviceCode);
         if (mMap.isEmpty()) {
             onLockAction("100", "Invalid device info", (actionType == 0) ? "close lock" : "open lock");
@@ -406,8 +407,10 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         String LOCK_ID = (mMap.containsKey("LOCK_ID")) ? mMap.get("LOCK_ID") : "";
         String btlockid = (mMap.containsKey("btlockid")) ? mMap.get("btlockid") : "";
         if (!CommonMethods.isValidString(lockData) || !CommonMethods.isValidString(macID)) {
+            Log.e("lockInfo","Lock info fetching...");
             getLockData(btlockid);
         } else {
+            Log.e("lockInfo","Lock info exists");
             SFProgress.showProgressDialog(mActivity, true);
             TTLockClient.getDefault().controlLock((actionType == 0) ? ControlAction.LOCK : ControlAction.UNLOCK, lockData, macID, new ControlLockCallback() {
                 @Override
@@ -434,6 +437,11 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
 
                 @Override
                 public void onFail(LockError error) {
+                    try{
+                        Log.e("Lockerror",error.getErrorMsg()+"\n"+error.getDescription());
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                     if (actionType == 0) {
                         onLockAction("100", "Failed to lock the device.", "close lock");
                     } else {

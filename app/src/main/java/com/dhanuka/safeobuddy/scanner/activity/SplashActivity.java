@@ -60,7 +60,11 @@ public class SplashActivity extends AppCompatActivity implements OnSafeAuthListe
                 String startDate = CommonMethods.getCalculatedDate("MM/dd/yyyy", -27);
                 String endDate = CommonMethods.getCurrentFormatedDate("MM/dd/yyyy");
 
-                mSafeLock.openLock(System.currentTimeMillis(),"9605866");
+                for(int a=0;a<mListLocks.size();a++) {
+                    if (mListLocks.get(a).getVehicleNumber().equalsIgnoreCase("FRANCHISE LOCK")) {
+                        mSafeLock.openLock(System.currentTimeMillis(), mListLocks.get(a).getDeviceCode());
+                    }
+                }
               //  mSafeLock.openLock(System.currentTimeMillis(),"wifi smart meter");
                 mSafeLock.getDeviceRecords(startDate, endDate, mListLocks.get(0).getDeviceID(), mListLocks.get(0).getVehicleNumber());
             }
