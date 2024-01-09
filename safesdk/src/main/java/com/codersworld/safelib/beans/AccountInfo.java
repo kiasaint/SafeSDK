@@ -1,15 +1,26 @@
 package com.codersworld.safelib.beans;
 
-public class AccountInfo extends ServerError {
+import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
+public class AccountInfo extends ServerError implements Serializable {
+
+@SerializedName("access_token")
     private String access_token;
+    @SerializedName("refresh_token")
     private String refresh_token;
+    @SerializedName("uid")
     private int uid;
+    @SerializedName("openid")
     private int openid;
+    @SerializedName("scope")
     private String scope;
+    @SerializedName("token_type")
     private String token_type;
+    @SerializedName("expires_in")
     private int expires_in;
-
+    @SerializedName("md5Pwd")
     private String md5Pwd;
 
     public String getAccess_token() {

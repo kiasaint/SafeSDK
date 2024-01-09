@@ -1,18 +1,25 @@
 package com.codersworld.safelib.beans;
 
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+
 /**
  * Created by TTLock on 2019/4/23.
  */
 
-public class ServerError {
+public class ServerError implements Serializable {
     /**
      * errcode : 10000
      * errmsg : invalid client_id
      * description : client_id不存在
      */
 
+    @SerializedName("errcode")
     public int errcode;
+    @SerializedName("errmsg")
     public String errmsg;
+    @SerializedName("description")
     public String description;
 
     public int getErrcode() {

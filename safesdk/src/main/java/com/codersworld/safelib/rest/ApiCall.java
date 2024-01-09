@@ -11,8 +11,9 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.codersworld.configs.urls.common.Links;
 import com.codersworld.safelib.beans.DeviceDetailBean;
+import com.codersworld.safelib.helpers.LoginGson;
 import com.codersworld.safelib.helpers.UserSessions;
-import com.codersworld.safelib.helpers.AESHelper;
+import com.codersworld.safelib.helpers.AESHelpers;
  import com.codersworld.safelib. beans.AccountInfo;
 import com.codersworld.safelib.beans.AllLocksBean;
 import com.codersworld.safelib.beans.KeyListObj;
@@ -61,11 +62,11 @@ public class ApiCall {
                 try {
                     if (response != null) {
                         try {
-                            String strResp = new AESHelper().safeDecryption(response.body().toString(), mContext);
-                            Log.e("strResp",strResp);
-                            LoginBean mBean = new Gson().fromJson(strResp, LoginBean.class);
-                            Log.e("strResp1",new Gson().toJson(mBean));
-                            onResponse.onSuccess(new UniverSelObjct(mBean, Links.SB_LOGIN_API, "true", ""));
+                            String strResp = new AESHelpers().safeDecryption(response.body().toString(), mContext);
+
+                             //LoginBean mBean = new Gson().fromJson(strResp, LoginBean.class);
+                             LoginBean mBean = new LoginGson().fromJson(strResp);
+                             onResponse.onSuccess(new UniverSelObjct(mBean, Links.SB_LOGIN_API, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
                             onResponse.onError(Links.SB_LOGIN_API, mContext.getResources().getString(R.string.something_wrong));
@@ -316,7 +317,7 @@ public class ApiCall {
                 try {
                     if (response != null) {
                         try {
-                            String strResp = new AESHelper().safeDecryption(response.body().toString(), mContext);
+                            String strResp = new AESHelpers().safeDecryption(response.body().toString(), mContext);
                             onResponse.onSuccess(new UniverSelObjct(strResp, Links.SB_API_GET_GATE_RECORDS, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -351,7 +352,7 @@ public class ApiCall {
                 try {
                     if (response != null) {
                         try {
-                            String strResp = new AESHelper().safeDecryption(response.body().toString(), mContext);
+                            String strResp = new AESHelpers().safeDecryption(response.body().toString(), mContext);
                             AllLocksBean mBean = new Gson().fromJson(strResp,AllLocksBean.class);
                              onResponse.onSuccess(new UniverSelObjct((mBean !=null)?mBean:new AllLocksBean(), Links.SB_GET_ALL_V3_LOCKS, "true", ""));
                         } catch (Exception e) {
@@ -383,7 +384,7 @@ public class ApiCall {
                 try {
                     if (response != null) {
                         try {
-                            String strResp = new AESHelper().safeDecryption(response.body().toString(), mContext);
+                            String strResp = new AESHelpers().safeDecryption(response.body().toString(), mContext);
                               onResponse.onSuccess(new UniverSelObjct(strResp, Links.SB_UPDATE_LOCK_DATA_CHILD, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -414,7 +415,7 @@ public class ApiCall {
                 try {
                     if (response != null) {
                         try {
-                            String strResp = new AESHelper().safeDecryption(response.body().toString(), mContext);
+                            String strResp = new AESHelpers().safeDecryption(response.body().toString(), mContext);
                              onResponse.onSuccess(new UniverSelObjct(strResp, Links.SB_UPDATE_LOCK_NAME, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -445,7 +446,7 @@ public class ApiCall {
                 try {
                     if (response != null) {
                         try {
-                            String strResp = new AESHelper().safeDecryption(response.body().toString(), mContext);
+                            String strResp = new AESHelpers().safeDecryption(response.body().toString(), mContext);
                              onResponse.onSuccess(new UniverSelObjct(strResp, Links.SB_DELETE_LOCK, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -476,7 +477,7 @@ public class ApiCall {
                 try {
                     if (response != null) {
                         try {
-                            String strResp = new AESHelper().safeDecryption(response.body().toString(), mContext);
+                            String strResp = new AESHelpers().safeDecryption(response.body().toString(), mContext);
                              onResponse.onSuccess(new UniverSelObjct(strResp, Links.SB_UPDATE_LOCK_NAME, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -506,7 +507,7 @@ public class ApiCall {
                 try {
                     if (response != null) {
                         try {
-                            String strResp = new AESHelper().safeDecryption(response.body().toString(), mContext);
+                            String strResp = new AESHelpers().safeDecryption(response.body().toString(), mContext);
                              onResponse.onSuccess(new UniverSelObjct(strResp, Links.SB_OPEN_LOCK, strParams[1], ""));
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -592,7 +593,7 @@ public class ApiCall {
                 try {
                     if (response != null) {
                         try {
-                            String strResp = new AESHelper().safeDecryption(response.body().toString(), mContext);
+                            String strResp = new AESHelpers().safeDecryption(response.body().toString(), mContext);
                              onResponse.onSuccess(new UniverSelObjct(strResp, Links.SB_API_SAVE_LOCK_STATUS, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -715,7 +716,7 @@ public class ApiCall {
                 try {
                     if (response != null) {
                         try {
-                            String strResp = new AESHelper().safeDecryption(response.body().toString(), mContext);
+                            String strResp = new AESHelpers().safeDecryption(response.body().toString(), mContext);
                             onResponse.onSuccess(new UniverSelObjct(strResp, Links.SB_API_ADD_NEW_LOCK, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -758,7 +759,7 @@ public class ApiCall {
                 try {
                     if (response != null) {
                         try {
-                            String strResp = new AESHelper().safeDecryption(response.body().toString(), mContext);
+                            String strResp = new AESHelpers().safeDecryption(response.body().toString(), mContext);
                             onResponse.onSuccess(new UniverSelObjct(strResp, Links.SB_API_ADD_NEW_LOCK, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();

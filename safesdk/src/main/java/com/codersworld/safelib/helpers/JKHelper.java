@@ -111,14 +111,14 @@ public class JKHelper extends Application implements OnResponse<UniverSelObjct> 
             id = mOTP.getId();
             this.mActivity = ctx;
             String params = Links.SB_OPEN_LOCK + "&ContactID=" + mOTP.getContactId() + "&DeviceID=" + mOTP.getDeviceId() + "&Rpwd=" + mOTP.getRpwd() + "&GenratePwd=" + mOTP.getOtp() + "&VehicleNo=" + mOTP.getVehicalNo() + "&type=" + mOTP.getType() + "&OtpGenerationTime=" + mOTP.getOtpGenerateTime() + "&Flag=" + "offline";
-            AESHelper mAESHelper = new AESHelper();
+            AESHelpers mAESHelper = new AESHelpers();
             String encParam = mAESHelper.safeEncryption(ctx, params);
             new ApiCall(ctx).uploadGeneratedOTP(this, encParam, mOTP.getId() + "");
         }
     }
     public void updateLockData(Activity ctx,String lockData,String lockMac, String lockId) {
         this.mActivity = ctx;
-        AESHelper mAESHelper = new AESHelper();
+        AESHelpers mAESHelper = new AESHelpers();
         String encParam = mAESHelper.safeEncryption(mActivity, membocool.getUpdateDataParams(lockData, lockMac, lockId,UserSessions.getUserInfo(mActivity).getUsername()));
         new ApiCall(ctx).updateLockData(this, encParam);
     }

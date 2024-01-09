@@ -1,12 +1,19 @@
 package com.codersworld.safelib.beans;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
 public class KeyListObj implements Serializable {
-    int total;
+
+@SerializedName("total")
+int total;
+    @SerializedName("pages")
     int pages;
+    @SerializedName("pageNo")
     int pageNo;
+    @SerializedName("pageSize")
     int pageSize;
 
     ArrayList<KeyObj> list;
@@ -52,29 +59,53 @@ public class KeyListObj implements Serializable {
     }
 
     public static class KeyObj implements Serializable{
+        @SerializedName("keyId")
         int keyId;
+        @SerializedName("lockId")
         int lockId;
+        @SerializedName("userType")
         String userType;
+        @SerializedName("keyStatus")
         String keyStatus;
+        @SerializedName("lockName")
         String lockName;
+        @SerializedName("lockAlias")
         String lockAlias;
+        @SerializedName("lockData")
         String lockData;
+        @SerializedName("lockKey")
         String lockKey;
+        @SerializedName("lockMac")
         String lockMac;
+        @SerializedName("lockFlagPos")
         int lockFlagPos;
+        @SerializedName("adminPwd")
         String adminPwd;
+        @SerializedName("noKeyPwd")
         String noKeyPwd;
+        @SerializedName("deletePwd")
         String deletePwd;
+        @SerializedName("electricQuantity")
         int electricQuantity;
+        @SerializedName("aesKeyStr")
         String aesKeyStr;
+        @SerializedName("lockVersion")
         LockVersionObj lockVersion;
+        @SerializedName("startDate")
         long startDate;
+        @SerializedName("endDate")
         long endDate;
+        @SerializedName("timezoneRawOffset")
         long timezoneRawOffset;
+        @SerializedName("remarks")
         String remarks;
+        @SerializedName("keyRight")
         int keyRight;
+        @SerializedName("keyboardPwdVersion")
         int keyboardPwdVersion;
+        @SerializedName("specialValue")
         int specialValue;
+        @SerializedName("remoteEnable")
         int remoteEnable;
 
         public int getKeyId() {

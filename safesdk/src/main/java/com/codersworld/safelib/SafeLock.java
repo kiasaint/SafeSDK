@@ -21,7 +21,7 @@ import com.codersworld.configs.urls.tt.tt;
 import com.codersworld.configs.urls.vehicletrack.membocool;
 import com.codersworld.safelib.beans.DeviceDetailBean;
 import com.codersworld.safelib.beans.KeyListObj;
-import com.codersworld.safelib.helpers.AESHelper;
+import com.codersworld.safelib.helpers.AESHelpers;
 import com.codersworld.safelib.helpers.JKHelper;
 import com.codersworld.safelib.helpers.UserSessions;
 import com.codersworld.safelib.listeners.OnAuthListener;
@@ -128,7 +128,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         initApiCall();
         new UserSessions().saveAccessToken(mActivity, "");
 
-        AESHelper mAESHelper = new AESHelper();
+        AESHelpers mAESHelper = new AESHelpers();
         String encParam = mAESHelper.safeEncryption(mActivity, membocool.getLoginParams(strUsername, strPassword, strAppVersion, strLat, strLong, CommonMethods.getIMEI(
                 mActivity)));
         if (CommonMethods.isNetworkAvailable(mActivity)) {
@@ -147,7 +147,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         mMap = new HashMap<>();
         mListLocks = new ArrayList<>();
         //String params = Links.SB_GET_ALL_V3_LOCKS + "&"+ com.codersworld.configs.urls.common.Constants.P_CAT+"=1&"+ com.codersworld.configs.urls.common.Constants.P_CID+"=" + UserSessions.getUserInfo(mActivity).getUid();
-        AESHelper mAESHelper = new AESHelper();
+        AESHelpers mAESHelper = new AESHelpers();
         String encParam = mAESHelper.safeEncryption(mActivity, membocool.getDevicesparams(UserSessions.getUserInfo(mActivity).getUid()));
         //  mApiCall.getAllV3Locks(this, "1",UserSessions.getUserInfo(mActivity).getUid());
 
@@ -173,7 +173,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                 "&DeviceId=" + device_id + "&VehicleNumber=" + device_name +
                 "&ToDate=" + endDate + "&FromDate=" + startDate + "&val1=" + "0" + "&val2=";
 */
-        AESHelper mAESHelper = new AESHelper();
+        AESHelpers mAESHelper = new AESHelpers();
         String encParam = mAESHelper.safeEncryption(mActivity, membocool.getRecordsParams(UserSessions.getUserInfo(mActivity).getUid(), device_id, device_name, endDate, startDate));
         mApiCall.getGateRecords(this, encParam);
     }

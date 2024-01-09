@@ -1,15 +1,26 @@
 package com.codersworld.safelib.beans;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 public class GenerateOTP implements Serializable {
-    private String otp;
+
+@SerializedName("otp")
+private String otp;
+    @SerializedName("rpwd")
     private String rpwd;
+    @SerializedName("otpGenerateTime")
     private String otpGenerateTime;
+    @SerializedName("contactId")
     private String contactId;
+    @SerializedName("deviceId")
     private String deviceId;
+    @SerializedName("vehicalNo")
     private String vehicalNo;
+    @SerializedName("type")
     private String type;
+    @SerializedName("Id")
     private int Id;
 
     public String getOtp() {

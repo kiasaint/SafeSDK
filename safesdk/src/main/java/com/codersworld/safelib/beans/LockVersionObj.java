@@ -1,5 +1,7 @@
 package com.codersworld.safelib.beans;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 
@@ -14,12 +16,19 @@ public class LockVersionObj implements Serializable {
      * scene : 2
      */
 
-    private boolean showAdminKbpwdFlag;
+@SerializedName("showAdminKbpwdFlag")
+private boolean showAdminKbpwdFlag;
+    @SerializedName("groupId")
     private int groupId;
+    @SerializedName("protocolVersion")
     private int protocolVersion;
+    @SerializedName("protocolType")
     private int protocolType;
+    @SerializedName("orgId")
     private int orgId;
+    @SerializedName("logoUrl")
     private String logoUrl;
+    @SerializedName("scene")
     private int scene;
 
     public boolean isShowAdminKbpwdFlag() {

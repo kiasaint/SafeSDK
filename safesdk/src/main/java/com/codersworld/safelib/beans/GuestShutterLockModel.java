@@ -99,7 +99,6 @@ public class GuestShutterLockModel implements Serializable {
     String autotimer;
     @SerializedName("btlockid")
     String btlockid;
-
     Boolean isActive = false;
     int permissionStatus = 0;//0 for not asked, 1 for asked, 2 for permission given
 
