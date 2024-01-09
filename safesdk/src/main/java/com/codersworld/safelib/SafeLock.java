@@ -33,6 +33,7 @@ import com.codersworld.safelib.beans.LoginBean;
 import com.codersworld.safelib.rest.ApiCall;
 import com.codersworld.safelib.rest.OnResponse;
 import com.codersworld.safelib.rest.UniverSelObjct;
+import com.codersworld.safelib.rest.ttlock.SensitiveInfo;
 import com.codersworld.safelib.utils.CommonMethods;
 import com.codersworld.safelib.utils.SFProgress;
 import com.depl.safelib.R;
@@ -52,8 +53,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-import com.codersworld.configs.urls.common.Constants;
-
 public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     static Activity mActivity;
     static long iniDateTime;
@@ -63,7 +62,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     static ApiCall mApiCall = null;
     OnSafeAuthListener mAuthListener = null;
     SQLiteDatabase database = null;
-    HashMap<String, HashMap<String, String>> mMap = new HashMap<>();
+    ArrayList<SensitiveInfo> mInfo = new ArrayList<>();
 
 
     public SafeLock(Activity activity, OnSafeAuthListener listener) {
@@ -144,7 +143,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
 
     public void getDeviceList() {
         initApiCall();
-        mMap = new HashMap<>();
+        mInfo = new ArrayList<>();
         mListLocks = new ArrayList<>();
         //String params = Links.SB_GET_ALL_V3_LOCKS + "&"+ com.codersworld.configs.urls.common.Constants.P_CAT+"=1&"+ com.codersworld.configs.urls.common.Constants.P_CID+"=" + UserSessions.getUserInfo(mActivity).getUid();
         AESHelpers mAESHelper = new AESHelpers();
@@ -214,15 +213,17 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                         if (mAllLocksBean != null) {
                             if (mAllLocksBean.getSuccess() == 1) {
                                 if (CommonMethods.isValidArrayList(mAllLocksBean.getNewusercreation())) {
+                                    mInfo = new ArrayList<>();
                                     for (int a = 0; a < mAllLocksBean.getNewusercreation().size(); a++) {
-                                        HashMap<String, String> mMap1 = new HashMap<>();
-                                        mMap1.put("LockData", mAllLocksBean.getNewusercreation().get(a).getLockData());
-                                        mMap1.put("MACID", mAllLocksBean.getNewusercreation().get(a).getMACID());
-                                        mMap1.put("LOCK_CODE", mAllLocksBean.getNewusercreation().get(a).getDeviceCode());
-                                        mMap1.put("LOCK_ID", mAllLocksBean.getNewusercreation().get(a).getDeviceID());
-                                        mMap1.put("btlockid", mAllLocksBean.getNewusercreation().get(a).getBtlockid());
-                                        mMap1.put("btlockidval", mAllLocksBean.getNewusercreation().get(a).getBtlockidval());
-                                        mMap.put(mAllLocksBean.getNewusercreation().get(a).getBtlockidval(), mMap1);
+                                        SensitiveInfo mbn = new SensitiveInfo();
+
+                                        mbn.setLockData(mAllLocksBean.getNewusercreation().get(a).getLockData());
+                                        mbn.setMACID(mAllLocksBean.getNewusercreation().get(a).getMACID());
+                                        mbn.setLOCK_CODE(mAllLocksBean.getNewusercreation().get(a).getDeviceCode());
+                                        mbn.setLOCK_ID(mAllLocksBean.getNewusercreation().get(a).getDeviceID());
+                                        mbn.setBtlockid(mAllLocksBean.getNewusercreation().get(a).getBtlockid());
+                                        mbn.setBtlockidval(mAllLocksBean.getNewusercreation().get(a).getBtlockidval());
+                                        mInfo.add(mbn);
                                         mAllLocksBean.getNewusercreation().get(a).setMACID("");
                                         mAllLocksBean.getNewusercreation().get(a).setLockData("");
                                         mAllLocksBean.getNewusercreation().get(a).setDeviceCode(mAllLocksBean.getNewusercreation().get(a).getBtlockidval());
@@ -230,7 +231,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                                         mAllLocksBean.getNewusercreation().get(a).setBtlockidval("");
                                         mAllLocksBean.getNewusercreation().get(a).setOwner_id(UserSessions.getUserInfo(mActivity).getUid());
                                     }
-                                    UserSessions.saveMap(mActivity, (mMap.size() > 0) ? mMap : new HashMap<String, HashMap<String, String>>());
+                                    UserSessions.saveMap(mActivity, (mInfo.size() > 0) ? mInfo : new ArrayList<>());
                                     onSafeDevices("106", "success", mAllLocksBean.getNewusercreation());
                                 } else {
                                     //no data found
@@ -290,24 +291,26 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                     try {
                         DeviceDetailBean mDeviceDetailBean = (DeviceDetailBean) response.getResponse();
                         if (mDeviceDetailBean != null) {
-                            HashMap<String, HashMap<String, String>> mMap2 = new HashMap<>();
+                            ArrayList<SensitiveInfo> mMap2 = new ArrayList<>();
                             mMap2 = UserSessions.getMap(mActivity);
-                            if (mMap2.containsKey(deviceCode)) {
-                                HashMap<String, String> mMap3 = mMap2.get(deviceCode);
-                                mMap3.put("LockData", mDeviceDetailBean.getLockData());
-                                mMap3.put("MACID", mDeviceDetailBean.getLockMac());
-                                mMap3.put("LOCK_CODE", mMap3.get("LOCK_CODE"));
-                                mMap3.put("LOCK_ID", mMap3.get("LOCK_ID"));
-                                mMap3.put("btlockid", mMap3.get("btlockid"));
-                                mMap3.put("btlockidval", mMap3.get("btlockidval"));
-                                mMap2.put(deviceCode, mMap3);
-                                UserSessions.saveMap(mActivity, mMap2);
-                                if (actionType == 1) {
-                                    openLock(System.currentTimeMillis(), deviceCode);
-                                } else if (actionType == 0) {
-                                    closeLock(deviceCode);
+                            for (int a = 0; a < mMap2.size(); a++) {
+                                if (mMap2.get(a).getBtlockidval().equalsIgnoreCase(deviceCode)) {
+                                    SensitiveInfo mMap3 = mMap2.get(a);
+                                    mMap3.setLockData( mDeviceDetailBean.getLockData());
+                                    mMap3.setMACID(mDeviceDetailBean.getLockMac());
+                                    mMap3.setLOCK_CODE( mMap3.getLOCK_CODE());
+                                    mMap3.setLOCK_ID( mMap3.getLOCK_ID());
+                                    mMap3.setBtlockid(mMap3.getBtlockid());
+                                    mMap3.setBtlockidval(mMap3.getBtlockidval());
+                                    mMap2.set(a, mMap3);
+                                    UserSessions.saveMap(mActivity, mMap2);
+                                    if (actionType == 1) {
+                                        openLock(System.currentTimeMillis(), deviceCode);
+                                    } else if (actionType == 0) {
+                                        closeLock(deviceCode);
+                                    }
+                                    new JKHelper().updateLockData(mActivity, mDeviceDetailBean.getLockData(), mDeviceDetailBean.getLockMac(), mDeviceDetailBean.getLockId());
                                 }
-                                new JKHelper().updateLockData(mActivity, mDeviceDetailBean.getLockData(), mDeviceDetailBean.getLockMac(), mDeviceDetailBean.getLockId());
                             }
                         }
 
@@ -392,26 +395,24 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     protected void actionLock() {
         iniDateTime = System.currentTimeMillis() + 1800000;
         long unlockdate = System.currentTimeMillis();
-        Log.e("deviceCodeasd",deviceCode);
-        HashMap<String, String> mMap = validateDevice(deviceCode);
-        if (mMap.isEmpty()) {
+         SensitiveInfo mMap = validateDevice(deviceCode);
+        if (mMap == null) {
             onLockAction("100", "Invalid device info", (actionType == 0) ? "close lock" : "open lock");
         } else if (iniDateTime < unlockdate) {
             onLockAction("100", "Please Refresh Page", (actionType == 0) ? "close lock" : "open lock");
             return;
         }
 
-        String lockData = (mMap.containsKey("LockData")) ? mMap.get("LockData") : "";
-        String macID = (mMap.containsKey("MACID")) ? mMap.get("MACID") : "";
-        String LOCK_CODE = (mMap.containsKey("LOCK_CODE")) ? mMap.get("LOCK_CODE") : "";
-        String LOCK_ID = (mMap.containsKey("LOCK_ID")) ? mMap.get("LOCK_ID") : "";
-        String btlockid = (mMap.containsKey("btlockid")) ? mMap.get("btlockid") : "";
-        if (!CommonMethods.isValidString(lockData) || !CommonMethods.isValidString(macID)) {
-            Log.e("lockInfo","Lock info fetching...");
-            getLockData(btlockid);
+
+        String lockData = (CommonMethods.isValidString(mMap.getLockData())) ? mMap.getLockData() : "";
+        String macID = (CommonMethods.isValidString(mMap.getMACID())) ? mMap.getMACID() : "";
+        String LOCK_CODE = (CommonMethods.isValidString(mMap.getLOCK_CODE())) ? mMap.getLOCK_CODE() : "";
+        String LOCK_ID = (CommonMethods.isValidString(mMap.getLOCK_ID())) ? mMap.getLOCK_ID() : "";
+        String btlockid = (CommonMethods.isValidString(mMap.getBtlockid())) ? mMap.getBtlockid() : "";
+         if (!CommonMethods.isValidString(lockData) || !CommonMethods.isValidString(macID)) {
+             getLockData(btlockid);
         } else {
-            Log.e("lockInfo","Lock info exists");
-            SFProgress.showProgressDialog(mActivity, true);
+             SFProgress.showProgressDialog(mActivity, true);
             TTLockClient.getDefault().controlLock((actionType == 0) ? ControlAction.LOCK : ControlAction.UNLOCK, lockData, macID, new ControlLockCallback() {
                 @Override
                 public void onControlLockSuccess(ControlLockResult controlLockResult) {
@@ -437,9 +438,9 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
 
                 @Override
                 public void onFail(LockError error) {
-                    try{
-                        Log.e("Lockerror",error.getErrorMsg()+"\n"+error.getDescription());
-                    }catch (Exception e){
+                    try {
+                        Log.e("Lockerror", error.getErrorMsg() + "\n" + error.getDescription());
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                     if (actionType == 0) {
@@ -489,13 +490,15 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         new JKHelper().makeTTAuthentication(mActivity, 4, (OnAuthListener) mActivity);
     }
 
-    private HashMap validateDevice(String deviceCode) {
-        HashMap<String, HashMap<String, String>> mMap2 = new HashMap<>();
+    private SensitiveInfo validateDevice(String deviceCode) {
+        ArrayList<SensitiveInfo> mMap2 = new ArrayList<>();
         mMap2 = UserSessions.getMap(mActivity);
-        if (mMap2.containsKey(deviceCode)) {
-            return mMap2.get(deviceCode);
-        } else {
-            return new HashMap();
+        SensitiveInfo mBn = null;
+        for (int a=0;a<mMap2.size(); a++) {
+            if (mMap2.get(a).getBtlockidval().equalsIgnoreCase(deviceCode)) {
+                mBn =  mMap2.get(a);
+            }
         }
+        return mBn;
     }
 }

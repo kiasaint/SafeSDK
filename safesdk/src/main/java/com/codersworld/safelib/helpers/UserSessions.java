@@ -8,6 +8,7 @@ import android.util.Log;
 import com.codersworld.safelib.beans.AccountInfo;
 import com.codersworld.safelib.beans.KeyListObj;
 import com.codersworld.safelib.beans.LoginBean;
+import com.codersworld.safelib.rest.ttlock.SensitiveInfo;
 import com.codersworld.safelib.utils.CommonMethods;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -141,7 +142,7 @@ public class UserSessions {
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         return mPrefs.getString(strKey, "");
     }
-    public static void saveMap(Context context, HashMap<String ,HashMap<String,String>> mMap) {
+    public static void saveMap(Context context, ArrayList<SensitiveInfo> mMap) {
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = mPrefs.edit();
         String str =  new Gson().toJson(mMap);
@@ -150,12 +151,12 @@ public class UserSessions {
         editor.commit();
     }
 
-    public static HashMap<String, HashMap<String, String>> getMap(Context context) {
+    public static ArrayList<SensitiveInfo> getMap(Context context) {
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         String str = mPrefs.getString("map", "");
-        HashMap<String, HashMap<String, String>> mapObj = new HashMap<>();
+        ArrayList<SensitiveInfo> mapObj = new ArrayList<>();
         if (!str.isEmpty()){
-         mapObj = new Gson().fromJson(str, new TypeToken<HashMap<String, HashMap<String, String>>>() {}.getType());
+         mapObj = new Gson().fromJson(str, new TypeToken<ArrayList<SensitiveInfo>>() {}.getType());
         }
         return mapObj ;
     }
