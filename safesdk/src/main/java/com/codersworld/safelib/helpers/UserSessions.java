@@ -143,6 +143,7 @@ public class UserSessions {
         return mPrefs.getString(strKey, "");
     }
     public static void saveMap(Context context, ArrayList<SensitiveInfo> mMap) {
+        Log.e("mMapmMap",new  Gson().toJson(mMap));
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = mPrefs.edit();
         String str =  new Gson().toJson(mMap);

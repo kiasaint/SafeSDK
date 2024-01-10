@@ -395,8 +395,10 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     protected void actionLock() {
         iniDateTime = System.currentTimeMillis() + 1800000;
         long unlockdate = System.currentTimeMillis();
+        Log.e("deviceCode",deviceCode);
          SensitiveInfo mMap = validateDevice(deviceCode);
         if (mMap == null) {
+            Log.e("SAFESDK","Device info not exists");
             onLockAction("100", "Invalid device info", (actionType == 0) ? "close lock" : "open lock");
         } else if (iniDateTime < unlockdate) {
             onLockAction("100", "Please Refresh Page", (actionType == 0) ? "close lock" : "open lock");
@@ -410,8 +412,10 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         String LOCK_ID = (CommonMethods.isValidString(mMap.getLOCK_ID())) ? mMap.getLOCK_ID() : "";
         String btlockid = (CommonMethods.isValidString(mMap.getBtlockid())) ? mMap.getBtlockid() : "";
          if (!CommonMethods.isValidString(lockData) || !CommonMethods.isValidString(macID)) {
+             Log.e("SAFESDK","Device info not exists");
              getLockData(btlockid);
         } else {
+             Log.e("SAFESDK","Device info exists");
              SFProgress.showProgressDialog(mActivity, true);
             TTLockClient.getDefault().controlLock((actionType == 0) ? ControlAction.LOCK : ControlAction.UNLOCK, lockData, macID, new ControlLockCallback() {
                 @Override
@@ -493,6 +497,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     private SensitiveInfo validateDevice(String deviceCode) {
         ArrayList<SensitiveInfo> mMap2 = new ArrayList<>();
         mMap2 = UserSessions.getMap(mActivity);
+        Log.e("mMap2",new Gson().toJson(mMap2));
         SensitiveInfo mBn = null;
         for (int a=0;a<mMap2.size(); a++) {
             if (mMap2.get(a).getBtlockidval().equalsIgnoreCase(deviceCode)) {
