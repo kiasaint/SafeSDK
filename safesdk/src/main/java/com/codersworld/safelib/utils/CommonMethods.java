@@ -501,17 +501,7 @@ public class CommonMethods {
     }
 
 
-    public static void clearFocus(MotionEvent event, View v, Activity mActivity) {
-        if (v instanceof EditText) {
-            Rect outRect = new Rect();
-            v.getGlobalVisibleRect(outRect);
-            if (!outRect.contains((int) event.getRawX(), (int) event.getRawY())) {
-                v.clearFocus();
-                InputMethodManager imm = (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-            }
-        }
-    }
+
 
     public static boolean isServiceRunning(Context ctx, Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);

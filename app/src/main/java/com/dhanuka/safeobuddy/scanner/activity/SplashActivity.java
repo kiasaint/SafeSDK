@@ -61,6 +61,7 @@ public class SplashActivity extends AppCompatActivity implements OnSafeAuthListe
                 String endDate = CommonMethods.getCurrentFormatedDate("MM/dd/yyyy");
 
                 for(int a=0;a<mListLocks.size();a++) {
+                    Log.e("locakname",mListLocks.get(a).getVehicleNumber());
                     if (mListLocks.get(a).getVehicleNumber().equalsIgnoreCase("FRANCHISE LOCK")) {
                         mSafeLock.openLock(System.currentTimeMillis(), mListLocks.get(a).getDeviceCode());
                     }

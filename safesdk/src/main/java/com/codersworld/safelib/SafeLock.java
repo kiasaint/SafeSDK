@@ -9,10 +9,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Vibrator;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 
@@ -35,6 +38,7 @@ import com.codersworld.safelib.rest.OnResponse;
 import com.codersworld.safelib.rest.UniverSelObjct;
 import com.codersworld.safelib.rest.ttlock.SensitiveInfo;
 import com.codersworld.safelib.utils.CommonMethods;
+import com.codersworld.safelib.utils.PermissionModule;
 import com.codersworld.safelib.utils.SFProgress;
 import com.depl.safelib.R;
 import com.google.gson.Gson;
@@ -296,10 +300,10 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                             for (int a = 0; a < mMap2.size(); a++) {
                                 if (mMap2.get(a).getBtlockidval().equalsIgnoreCase(deviceCode)) {
                                     SensitiveInfo mMap3 = mMap2.get(a);
-                                    mMap3.setLockData( mDeviceDetailBean.getLockData());
+                                    mMap3.setLockData(mDeviceDetailBean.getLockData());
                                     mMap3.setMACID(mDeviceDetailBean.getLockMac());
-                                    mMap3.setLOCK_CODE( mMap3.getLOCK_CODE());
-                                    mMap3.setLOCK_ID( mMap3.getLOCK_ID());
+                                    mMap3.setLOCK_CODE(mMap3.getLOCK_CODE());
+                                    mMap3.setLOCK_ID(mMap3.getLOCK_ID());
                                     mMap3.setBtlockid(mMap3.getBtlockid());
                                     mMap3.setBtlockidval(mMap3.getBtlockidval());
                                     mMap2.set(a, mMap3);
@@ -389,16 +393,19 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     public void closeLock(String deviceCode/*String lockData, String macID*/) {
         actionType = 0;
         this.deviceCode = deviceCode;
-        actionLock();
+        PermissionModule m = new PermissionModule(mActivity);
+        if (m.checkBTPermissions()) {
+            actionLock();
+        } else {
+            m.requestForPermissions();
+        }
     }
 
     protected void actionLock() {
         iniDateTime = System.currentTimeMillis() + 1800000;
         long unlockdate = System.currentTimeMillis();
-        Log.e("deviceCode",deviceCode);
-         SensitiveInfo mMap = validateDevice(deviceCode);
+        SensitiveInfo mMap = validateDevice(deviceCode);
         if (mMap == null) {
-            Log.e("SAFESDK","Device info not exists");
             onLockAction("100", "Invalid device info", (actionType == 0) ? "close lock" : "open lock");
         } else if (iniDateTime < unlockdate) {
             onLockAction("100", "Please Refresh Page", (actionType == 0) ? "close lock" : "open lock");
@@ -411,12 +418,10 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         String LOCK_CODE = (CommonMethods.isValidString(mMap.getLOCK_CODE())) ? mMap.getLOCK_CODE() : "";
         String LOCK_ID = (CommonMethods.isValidString(mMap.getLOCK_ID())) ? mMap.getLOCK_ID() : "";
         String btlockid = (CommonMethods.isValidString(mMap.getBtlockid())) ? mMap.getBtlockid() : "";
-         if (!CommonMethods.isValidString(lockData) || !CommonMethods.isValidString(macID)) {
-             Log.e("SAFESDK","Device info not exists");
-             getLockData(btlockid);
+        if (!CommonMethods.isValidString(lockData) || !CommonMethods.isValidString(macID)) {
+            getLockData(btlockid);
         } else {
-             Log.e("SAFESDK","Device info exists");
-             SFProgress.showProgressDialog(mActivity, true);
+            SFProgress.showProgressDialog(mActivity, true);
             TTLockClient.getDefault().controlLock((actionType == 0) ? ControlAction.LOCK : ControlAction.UNLOCK, lockData, macID, new ControlLockCallback() {
                 @Override
                 public void onControlLockSuccess(ControlLockResult controlLockResult) {
@@ -437,7 +442,6 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                     }
                     //unlockRecordUpload("Locked via App");
                     SFProgress.hideProgressDialog(mActivity);
-
                 }
 
                 @Override
@@ -461,7 +465,12 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     public void openLock(long unlockdate, String deviceCode) {
         this.deviceCode = deviceCode;
         actionType = 1;
-        actionLock();
+        PermissionModule m = new PermissionModule(mActivity);
+        if (m.checkBTPermissions()) {
+            actionLock();
+        } else {
+            m.requestForPermissions();
+        }
     }
 
     private void getLockData(String lock_code) {
@@ -497,13 +506,13 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     private SensitiveInfo validateDevice(String deviceCode) {
         ArrayList<SensitiveInfo> mMap2 = new ArrayList<>();
         mMap2 = UserSessions.getMap(mActivity);
-        Log.e("mMap2",new Gson().toJson(mMap2));
         SensitiveInfo mBn = null;
-        for (int a=0;a<mMap2.size(); a++) {
+        for (int a = 0; a < mMap2.size(); a++) {
             if (mMap2.get(a).getBtlockidval().equalsIgnoreCase(deviceCode)) {
-                mBn =  mMap2.get(a);
+                mBn = mMap2.get(a);
             }
         }
         return mBn;
     }
+
 }
