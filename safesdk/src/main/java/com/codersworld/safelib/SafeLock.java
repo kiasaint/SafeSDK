@@ -23,6 +23,7 @@ import com.codersworld.configs.urls.common.Links;
 import com.codersworld.configs.urls.tt.tt;
 import com.codersworld.configs.urls.vehicletrack.membocool;
 import com.codersworld.safelib.beans.DeviceDetailBean;
+import com.codersworld.safelib.beans.DeviceInfoBean;
 import com.codersworld.safelib.beans.KeyListObj;
 import com.codersworld.safelib.helpers.AESHelpers;
 import com.codersworld.safelib.helpers.JKHelper;
@@ -34,7 +35,9 @@ import com.codersworld.safelib.beans.AllLocksBean;
 import com.codersworld.safelib.beans.GateRecordsBean;
 import com.codersworld.safelib.beans.LoginBean;
 import com.codersworld.safelib.rest.ApiCall;
+import com.codersworld.safelib.rest.ApiRequest;
 import com.codersworld.safelib.rest.OnResponse;
+import com.codersworld.safelib.rest.RetrofitRequest;
 import com.codersworld.safelib.rest.UniverSelObjct;
 import com.codersworld.safelib.rest.ttlock.SensitiveInfo;
 import com.codersworld.safelib.utils.CommonMethods;
@@ -56,6 +59,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     static Activity mActivity;
@@ -171,11 +178,6 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     public void getDeviceRecords(String startDate, String endDate, String device_id, String device_name) {
         initApiCall();
         mListLocks = new ArrayList<>();
-/*
-        String params = Links.SB_API_GET_GATE_RECORDS + "&"+ com.codersworld.configs.urls.common.Constants.P_CONTACT_ID+"=" + UserSessions.getUserInfo(mActivity).getUid() +
-                "&DeviceId=" + device_id + "&VehicleNumber=" + device_name +
-                "&ToDate=" + endDate + "&FromDate=" + startDate + "&val1=" + "0" + "&val2=";
-*/
         AESHelpers mAESHelper = new AESHelpers();
         String encParam = mAESHelper.safeEncryption(mActivity, membocool.getRecordsParams(UserSessions.getUserInfo(mActivity).getUid(), device_id, device_name, endDate, startDate));
         mApiCall.getGateRecords(this, encParam);
@@ -185,6 +187,50 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     public void onSuccess(UniverSelObjct response) {
         try {
             switch (response.getMethodname()) {
+                case "getlockmacdetails":
+                    try {
+                        SFProgress.hideProgressDialog(mActivity);
+                    } catch (Exception e) {
+                    }
+                    try {
+                        DeviceInfoBean mDeviceInfoBean = (DeviceInfoBean) response.getResponse();
+                        if (mDeviceInfoBean.getSuccess() == 1) {
+                            mInfo = new ArrayList<>();
+                            for (int a = 0; a < mDeviceInfoBean.getReturnds().size(); a++) {
+                                if (CommonMethods.isValidString(mDeviceInfoBean.getReturnds().get(a).getLockdata()) && CommonMethods.isValidString(mDeviceInfoBean.getReturnds().get(a).getMacId())) {
+                                    SensitiveInfo mbn = new SensitiveInfo();
+                                    mbn.setLockData(mDeviceInfoBean.getReturnds().get(a).getLockdata());
+                                    mbn.setMACID(mDeviceInfoBean.getReturnds().get(a).getMacId());
+                                    mbn.setLOCK_CODE(mDeviceInfoBean.getReturnds().get(a).getLockCode());
+                                    mbn.setLOCK_ID(mDeviceInfoBean.getReturnds().get(a).getLockId());
+                                    mbn.setBtlockid(mDeviceInfoBean.getReturnds().get(a).getLockId());
+                                    mbn.setBtlockidval(mDeviceInfoBean.getReturnds().get(a).getLockId());
+                                    mInfo.add(mbn);
+                                }
+                            }
+                            UserSessions.saveMap(mActivity, (mInfo.size() > 0) ? mInfo : new ArrayList<>());
+                            if (actionType == 1) {
+                                openLock(System.currentTimeMillis(), deviceCode);
+                            } else if (actionType == 0) {
+                                closeLock(deviceCode);
+                            }
+
+                        } else {
+                            if (actionType == 0) {
+                                onLockAction("101", mActivity.getString(R.string.something_wrong), "close lock");
+                            } else {
+                                onLockAction("102", mActivity.getString(R.string.something_wrong), "open lock");
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        if (actionType == 0) {
+                            onLockAction("101", mActivity.getString(R.string.something_wrong), "close lock");
+                        } else {
+                            onLockAction("102", mActivity.getString(R.string.something_wrong), "open lock");
+                        }
+                    }
+                    break;
                 case Links.SB_LOGIN_API:
                     try {
                         LoginBean mLoginBean = (LoginBean) response.getResponse();
@@ -358,6 +404,13 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     public void onError(String type, String error) {
         try {
             switch (type) {
+                case "getlockmacdetails":
+                    try {
+                        SFProgress.hideProgressDialog(mActivity);
+                    } catch (Exception e) {
+                    }
+                    actionLock();
+                    break;
                 case Links.SB_API_TTLOCK_USER_KEYLIST:
                     /*if (mAuthListener != null) {
                         onAuthResult("100", error);
@@ -386,6 +439,13 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     @Override
     public void onAuth(AccountInfo mInfo) {
         onAuthResult("106", mActivity.getString(R.string.login_success));
+    }
+
+
+    public void manualLockAction(String lockId, int type) {//1 for lock open 0 for lock close
+        deviceCode = lockId;
+        actionType = type;
+        getDeviceInfo(lockId);
     }
 
     int actionType = -1;
@@ -514,5 +574,14 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         }
         return mBn;
     }
+
+    public void getDeviceInfo(String... strParams) {
+        initApiCall();
+        SFProgress.showProgressDialog(mActivity, true);
+//"103599","C29BD1254FB14B28B129F972C909AF5B1FBD3EA8F5EA4E50A7DA7B10269DD8B8"
+        LoginBean.InfoBean mBeanUser = UserSessions.getUserInfo(mActivity);
+        mApiCall.getDeviceInfo(this, strParams[0], mBeanUser.getUid(), UserSessions.getAccessToken(mActivity));
+    }
+
 
 }

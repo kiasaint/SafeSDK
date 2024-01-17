@@ -11,6 +11,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.codersworld.configs.urls.common.Links;
 import com.codersworld.safelib.beans.DeviceDetailBean;
+import com.codersworld.safelib.beans.DeviceInfoBean;
 import com.codersworld.safelib.helpers.LoginGson;
 import com.codersworld.safelib.helpers.UserSessions;
 import com.codersworld.safelib.helpers.AESHelpers;
@@ -924,6 +925,35 @@ public class ApiCall {
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         Volley.newRequestQueue(mContext).add(postRequest);
+    }
+    public void getDeviceInfo(OnResponse<UniverSelObjct> onResponse, String... strParams) {
+        com.codersworld.safelib.rest.ApiRequest mRequest = RetrofitRequest.getRetrofitInstance(1, 2).create(com.codersworld.safelib.rest.ApiRequest.class);
+        mRequest.getDeviceInfo(strParams[0],strParams[1],strParams[2]).enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                try {
+                    if (response != null) {
+                        try {
+                            DeviceInfoBean mBean = new Gson().fromJson(response.body().toString(),DeviceInfoBean.class);
+                            onResponse.onSuccess(new UniverSelObjct(mBean, "getlockmacdetails", "true", ""));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            onResponse.onError("getlockmacdetails", mContext.getResources().getString(R.string.something_wrong));
+                        }
+                    } else {
+                        onResponse.onError("getlockmacdetails", mContext.getResources().getString(R.string.something_wrong));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                t.printStackTrace();
+                onResponse.onError("getlockmacdetails", mContext.getResources().getString(R.string.something_wrong));
+            }
+        });
     }
 
 }
