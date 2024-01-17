@@ -179,7 +179,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         initApiCall();
         mListLocks = new ArrayList<>();
         AESHelpers mAESHelper = new AESHelpers();
-        String encParam = mAESHelper.safeEncryption(mActivity, membocool.getRecordsParams(UserSessions.getUserInfo(mActivity).getUid(), device_id, device_name, endDate, startDate));
+         String encParam = mAESHelper.safeEncryption(mActivity, membocool.getRecordsParams(UserSessions.getUserInfo(mActivity).getUid(), device_id, device_name, endDate, startDate));
         mApiCall.getGateRecords(this, encParam);
     }
 

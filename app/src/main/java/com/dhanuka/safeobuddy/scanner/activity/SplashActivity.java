@@ -46,9 +46,8 @@ public class SplashActivity extends AppCompatActivity implements OnSafeAuthListe
         Log.e("onSafeAuth", errorCode + "\n" + message);
         if (errorCode.equalsIgnoreCase("106")) {
 
-            mSafeLock.manualLockAction("9605866",1);
-//            mSafeLock.getDeviceInfo("9605866","103599","C29BD1254FB14B28B129F972C909AF5B1FBD3EA8F5EA4E50A7DA7B10269DD8B8");
-            //mSafeLock.getDeviceList();
+            //mSafeLock.manualLockAction("9605866",1);
+            mSafeLock.getDeviceList();
         }
 //J6o+BXjdFci24T7EcRf2bb4+n2ETbMq/f62L6WifcirH5SiYFdP92RPddHC6mnvrJW4WjEMQt0AioYE/0s79T0Rs/zCj/tEgek/5c/8GwHvDN8r8Rc4NeHkuB6vPxbZtNJlPxKsF/dgHZ8n2EzJMNvN5q99zKaav4udCUaFFCiQ=
 //J6o+BXjdFci24T7EcRf2bb4+n2ETbMq/f62L6Wifcio+Kv/OikdeUxB5RF1jj6Ea+eMhs7wGXNtgLtkRv1vijIxHYGUD20j+dbaHAlvH+zx8cljnFqJkj0QWmz/Xe/Gq9Q1ZZc2rowimqh2Y3DMLMRiWX+fCDsd5Vs9KzYg9+LM=
