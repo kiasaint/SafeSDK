@@ -11,7 +11,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.codersworld.configs.urls.common.Links;
 import com.codersworld.safelib.beans.DeviceDetailBean;
-import com.codersworld.safelib.beans.DeviceInfoBean;
+import com.codersworld.configs.beans.DeviceInfoBean;
 import com.codersworld.safelib.helpers.LoginGson;
 import com.codersworld.safelib.helpers.UserSessions;
 import com.codersworld.safelib.helpers.AESHelpers;
@@ -33,6 +33,8 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.http.Query;
+
 import com.codersworld.configs.rest.ApiRequest;
 
 import org.json.JSONObject;
@@ -338,6 +340,34 @@ public class ApiCall {
             }
         });
     }
+    public void getGateRecordsData(OnResponse<UniverSelObjct> onResponse, String... strParams) {
+        ApiRequest mRequest = RetrofitRequest.getRetrofitInstance(1, 2).create(ApiRequest.class);
+        mRequest.getGateRecordsData(strParams[0],strParams[1],strParams[2],strParams[3],strParams[4],strParams[5],strParams[6],strParams[7]).enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                try {
+                    if (response != null) {
+                        try {
+                             onResponse.onSuccess(new UniverSelObjct(response.body().toString(), Links.SB_API_GET_GATE_RECORDS_DATA, "true", ""));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            onResponse.onError(Links.SB_API_GET_GATE_RECORDS_DATA, mContext.getResources().getString(R.string.something_wrong));
+                        }
+                    } else {
+                        onResponse.onError(Links.SB_API_GET_GATE_RECORDS_DATA, mContext.getResources().getString(R.string.something_wrong));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                t.printStackTrace();
+                onResponse.onError(Links.SB_API_GET_GATE_RECORDS_DATA, mContext.getResources().getString(R.string.something_wrong));
+            }
+        });
+    }
 
     public void getAllV3Locks(OnResponse<UniverSelObjct> onResponse, String... strParams) {
         ApiRequest mRequest = RetrofitRequest.getRetrofitInstance(1, 2).create(ApiRequest.class);
@@ -582,7 +612,8 @@ public class ApiCall {
         } catch (Exception e) {
         }
         ApiRequest mRequest = RetrofitRequest.getRetrofitInstance(1, 2).create(ApiRequest.class);
-        mRequest.saveLockStatus(strParams[0]).enqueue(new Callback<String>() {
+
+        mRequest.saveGateRecords(strParams[0],strParams[1],strParams[2],strParams[3],strParams[4],strParams[5],strParams[6]).enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 try {
@@ -593,14 +624,13 @@ public class ApiCall {
                 try {
                     if (response != null) {
                         try {
-                            String strResp = new AESHelpers().safeDecryption(response.body().toString(), mContext);
-                             onResponse.onSuccess(new UniverSelObjct(strResp, Links.SB_API_SAVE_LOCK_STATUS, "true", ""));
+                              onResponse.onSuccess(new UniverSelObjct(response.body().toString(), Links.SB_API_SAVE_LOCK_STATUS_DATA, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            onResponse.onError(Links.SB_API_SAVE_LOCK_STATUS, mContext.getResources().getString(R.string.something_wrong));
+                            onResponse.onError(Links.SB_API_SAVE_LOCK_STATUS_DATA, mContext.getResources().getString(R.string.something_wrong));
                         }
                     } else {
-                        onResponse.onError(Links.SB_API_SAVE_LOCK_STATUS, mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_API_SAVE_LOCK_STATUS_DATA, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -614,7 +644,7 @@ public class ApiCall {
                     SFProgress.hideProgressDialog(mContext);
                 } catch (Exception e) {
                 }
-                onResponse.onError(Links.SB_API_SAVE_LOCK_STATUS, mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_API_SAVE_LOCK_STATUS_DATA, mContext.getResources().getString(R.string.something_wrong));
             }
         });
     }
@@ -927,21 +957,21 @@ public class ApiCall {
         Volley.newRequestQueue(mContext).add(postRequest);
     }
     public void getDeviceInfo(OnResponse<UniverSelObjct> onResponse, String... strParams) {
-        com.codersworld.safelib.rest.ApiRequest mRequest = RetrofitRequest.getRetrofitInstance(1, 2).create(com.codersworld.safelib.rest.ApiRequest.class);
+        ApiRequest mRequest = RetrofitRequest.getRetrofitInstance(1, 2).create(ApiRequest.class);
         mRequest.getDeviceInfo(strParams[0],strParams[1],strParams[2]).enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 try {
                     if (response != null) {
                         try {
-                            DeviceInfoBean mBean = new Gson().fromJson(response.body().toString(),DeviceInfoBean.class);
-                            onResponse.onSuccess(new UniverSelObjct(mBean, "getlockmacdetails", "true", ""));
+                             DeviceInfoBean mBean = new Gson().fromJson(response.body().toString(),DeviceInfoBean.class);
+                            onResponse.onSuccess(new UniverSelObjct(mBean, Links.SB_API_GET_DEVICE_INFO, "true", ""));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            onResponse.onError("getlockmacdetails", mContext.getResources().getString(R.string.something_wrong));
+                            onResponse.onError(Links.SB_API_GET_DEVICE_INFO, mContext.getResources().getString(R.string.something_wrong));
                         }
                     } else {
-                        onResponse.onError("getlockmacdetails", mContext.getResources().getString(R.string.something_wrong));
+                        onResponse.onError(Links.SB_API_GET_DEVICE_INFO, mContext.getResources().getString(R.string.something_wrong));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -951,7 +981,7 @@ public class ApiCall {
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 t.printStackTrace();
-                onResponse.onError("getlockmacdetails", mContext.getResources().getString(R.string.something_wrong));
+                onResponse.onError(Links.SB_API_GET_DEVICE_INFO, mContext.getResources().getString(R.string.something_wrong));
             }
         });
     }

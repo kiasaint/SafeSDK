@@ -19,12 +19,13 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 
+import com.codersworld.safelib.beans.LockRecordsBean;
 import com.codersworld.configs.urls.common.Links;
 import com.codersworld.configs.urls.tt.tt;
 import com.codersworld.configs.urls.vehicletrack.membocool;
 import com.codersworld.safelib.beans.DeviceDetailBean;
-import com.codersworld.safelib.beans.DeviceInfoBean;
-import com.codersworld.safelib.beans.KeyListObj;
+import com.codersworld.configs.beans.DeviceInfoBean;
+import com.codersworld.safelib.beans.LockRecords;
 import com.codersworld.safelib.helpers.AESHelpers;
 import com.codersworld.safelib.helpers.JKHelper;
 import com.codersworld.safelib.helpers.UserSessions;
@@ -164,37 +165,49 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         mApiCall.getAllV3Locks(this, encParam);
     }
 
-    /*    public void getDeviceRecords(String strDate,String device_id,String strStartDate,String strEndDate) {
-            initApiCall();
-            String ClientID  = Tags.TT_CLIENT_ID;
-            mApiCall.getLockRecords(this,ClientID,UserSessions.getAccessToken(mActivity),"1","100",strDate,device_id,strStartDate,strEndDate);
+    public void updateLockStatus(SensitiveInfo mMap, String msg) {
+        initApiCall();
+        String strDeviceId = (CommonMethods.isValidString(mMap.getLOCK_ID())) ? mMap.getLOCK_ID() : (CommonMethods.isValidString(mMap.getLOCK_CODE()) ? mMap.getLOCK_CODE() : "");
+        mInfo = new ArrayList<>();
+        mListLocks = new ArrayList<>();
+         mApiCall.saveLockStatus(this, UserSessions.getUserInfo(mActivity).getUid(),
+                strDeviceId, UserSessions.getUserInfo(mActivity).getUsername(), msg, "6", "", "TTLock");
+    }
 
-            mListLocks = new ArrayList<>();
-            String params = Tags.SB_GET_ALL_V3_LOCKS + "&cat=1&cid=" + UserSessions.getUserInfo(mActivity).getUid() + "&deviceId=";
-            AESHelper mAESHelper =new  AESHelper();
-            String encParam = mAESHelper.safeEncryption(mActivity, params);
-            mApiCall.getLockRecords(this, encParam);
-        }*/
+    public void getLockRecords(String device_id) {
+        actionType = 3;
+        getDeviceInfo(device_id);
+    }
+
+    private void getLockRecordsData(DeviceInfoBean.InfoBean mMap) {
+        initApiCall();
+        mListLocks = new ArrayList<>();
+         String startDate = CommonMethods.getCalculatedDate("MM/dd/yyyy", -7);
+        String endDate = CommonMethods.getCurrentFormatedDate("MM/dd/yyyy");
+        mApiCall.getGateRecordsData(this, startDate, endDate, mMap.getVehicleNumber(), mMap.getLockId(), UserSessions.getUserInfo(mActivity).getUid(), "18", "", "");
+    }
+
     public void getDeviceRecords(String startDate, String endDate, String device_id, String device_name) {
         initApiCall();
         mListLocks = new ArrayList<>();
         AESHelpers mAESHelper = new AESHelpers();
-         String encParam = mAESHelper.safeEncryption(mActivity, membocool.getRecordsParams(UserSessions.getUserInfo(mActivity).getUid(), device_id, device_name, endDate, startDate));
-        mApiCall.getGateRecords(this, encParam);
+        String strPrms = membocool.getRecordsParams(UserSessions.getUserInfo(mActivity).getUid(), device_id, device_name, endDate, startDate);
+        String encParam = mAESHelper.safeEncryption(mActivity, strPrms);
+        mApiCall.getGateRecords(this, strPrms);
     }
 
     @Override
     public void onSuccess(UniverSelObjct response) {
         try {
             switch (response.getMethodname()) {
-                case "getlockmacdetails":
+                case Links.SB_API_GET_DEVICE_INFO:
                     try {
                         SFProgress.hideProgressDialog(mActivity);
                     } catch (Exception e) {
                     }
                     try {
                         DeviceInfoBean mDeviceInfoBean = (DeviceInfoBean) response.getResponse();
-                        if (mDeviceInfoBean.getSuccess() == 1) {
+                         if (mDeviceInfoBean.getSuccess() == 1) {
                             mInfo = new ArrayList<>();
                             for (int a = 0; a < mDeviceInfoBean.getReturnds().size(); a++) {
                                 if (CommonMethods.isValidString(mDeviceInfoBean.getReturnds().get(a).getLockdata()) && CommonMethods.isValidString(mDeviceInfoBean.getReturnds().get(a).getMacId())) {
@@ -205,6 +218,8 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                                     mbn.setLOCK_ID(mDeviceInfoBean.getReturnds().get(a).getLockId());
                                     mbn.setBtlockid(mDeviceInfoBean.getReturnds().get(a).getLockId());
                                     mbn.setBtlockidval(mDeviceInfoBean.getReturnds().get(a).getLockId());
+                                    mbn.setGPSDeviceCode(mDeviceInfoBean.getReturnds().get(a).getLockId());
+                                    mbn.setGPSDeviceId(mDeviceInfoBean.getReturnds().get(a).getLockId());
                                     mInfo.add(mbn);
                                 }
                             }
@@ -213,8 +228,9 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                                 openLock(System.currentTimeMillis(), deviceCode);
                             } else if (actionType == 0) {
                                 closeLock(deviceCode);
+                            } else if (actionType == 3) {
+                                getLockRecordsData(mDeviceInfoBean.getReturnds().get(0));
                             }
-
                         } else {
                             if (actionType == 0) {
                                 onLockAction("101", mActivity.getString(R.string.something_wrong), "close lock");
@@ -273,6 +289,8 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                                         mbn.setLOCK_ID(mAllLocksBean.getNewusercreation().get(a).getDeviceID());
                                         mbn.setBtlockid(mAllLocksBean.getNewusercreation().get(a).getBtlockid());
                                         mbn.setBtlockidval(mAllLocksBean.getNewusercreation().get(a).getBtlockidval());
+                                        mbn.setGPSDeviceCode("");
+                                        mbn.setGPSDeviceId("");
                                         mInfo.add(mbn);
                                         mAllLocksBean.getNewusercreation().get(a).setMACID("");
                                         mAllLocksBean.getNewusercreation().get(a).setLockData("");
@@ -298,34 +316,13 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                         onSafeDevices("100", mActivity.getString(R.string.something_wrong), null);
                     }
                     break;
-                case Links.SB_API_GET_GATE_RECORDS:
+                case Links.SB_API_GET_GATE_RECORDS_DATA:
                     try {
                         JSONObject jsonObjct = new JSONObject(response.getResponse().toString());
                         if (jsonObjct.getInt("success") == 1) {
-                            GateRecordsBean gateOpenBean = new Gson().fromJson(response.getResponse().toString(), GateRecordsBean.class);
-                            if (gateOpenBean != null && CommonMethods.isValidArrayList(gateOpenBean.getGetCOmmandSent())) {
-                                for (int a = 0; a < gateOpenBean.getGetCOmmandSent().size(); a++) {
-                                    GateRecordsBean.InfoBean mBean = gateOpenBean.getGetCOmmandSent().get(a);
-                                    if (CommonMethods.isValidString(mBean.getSetupTime())) {
-                                        String[] arr = mBean.getSentTime().split(" ");
-                                        String dtStart = arr[0];
-                                        gateOpenBean.getGetCOmmandSent().get(a).setDate(dtStart);
-                                        long timeInMilliseconds = 0;
-                                        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-                                        try {
-                                            Date mDate = sdf.parse(mBean.getSetupTime());
-                                            timeInMilliseconds = mDate.getTime();
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                        gateOpenBean.getGetCOmmandSent().get(a).setUnixTime(timeInMilliseconds);
-                                        if (arr.length > 0) {
-                                            gateOpenBean.getGetCOmmandSent().get(a).setSentTime(arr[1]);
-                                        }
-                                    }
-                                }
-                                onSafeRecords("106", "Success", gateOpenBean.getGetCOmmandSent());
-                                //gateOpenBean.getCOmmandSent
+                            LockRecordsBean gateOpenBean = new Gson().fromJson(response.getResponse().toString(), LockRecordsBean.class);
+                            if (gateOpenBean != null && CommonMethods.isValidArrayList(gateOpenBean.getReturnds())) {
+                                onSafeRecords("106", "Success", gateOpenBean.getReturnds());
                             } else {
                                 onSafeRecords("100", mActivity.getString(R.string.something_wrong), null);
                             }
@@ -352,6 +349,8 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                                     mMap3.setLOCK_ID(mMap3.getLOCK_ID());
                                     mMap3.setBtlockid(mMap3.getBtlockid());
                                     mMap3.setBtlockidval(mMap3.getBtlockidval());
+                                    mMap3.setGPSDeviceCode(mMap3.getGPSDeviceCode());
+                                    mMap3.setGPSDeviceId(mMap3.getGPSDeviceId());
                                     mMap2.set(a, mMap3);
                                     UserSessions.saveMap(mActivity, mMap2);
                                     if (actionType == 1) {
@@ -381,7 +380,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         }
     }
 
-    private void onSafeRecords(String code, String msg, ArrayList<GateRecordsBean.InfoBean> mListRecords) {
+    private void onSafeRecords(String code, String msg, ArrayList<LockRecordsBean.InfoBean> mListRecords) {
         if (mAuthListener != null) {
             mAuthListener.onSafeRecords(code, msg, mListRecords);
         }
@@ -404,7 +403,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     public void onError(String type, String error) {
         try {
             switch (type) {
-                case "getlockmacdetails":
+                case Links.SB_API_GET_DEVICE_INFO:
                     try {
                         SFProgress.hideProgressDialog(mActivity);
                     } catch (Exception e) {
@@ -426,7 +425,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                         onSafeDevices("100", error, null);
                     }
                     break;
-                case Links.SB_API_GET_GATE_RECORDS:
+                case Links.SB_API_GET_GATE_RECORDS_DATA:
                     if (mAuthListener != null) {
                         onSafeRecords("100", error, null);
                     }
@@ -475,8 +474,6 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
 
         String lockData = (CommonMethods.isValidString(mMap.getLockData())) ? mMap.getLockData() : "";
         String macID = (CommonMethods.isValidString(mMap.getMACID())) ? mMap.getMACID() : "";
-        String LOCK_CODE = (CommonMethods.isValidString(mMap.getLOCK_CODE())) ? mMap.getLOCK_CODE() : "";
-        String LOCK_ID = (CommonMethods.isValidString(mMap.getLOCK_ID())) ? mMap.getLOCK_ID() : "";
         String btlockid = (CommonMethods.isValidString(mMap.getBtlockid())) ? mMap.getBtlockid() : "";
         if (!CommonMethods.isValidString(lockData) || !CommonMethods.isValidString(macID)) {
             getLockData(btlockid);
@@ -491,7 +488,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                         } else {
                             onLockAction("106", "Lock opened successfully.", "open lock");
                         }
-                        //unlockRecordUpload("Opened via APP");
+                        updateLockStatus(mMap, (actionType == 0) ? "Closed via APP" : "Opened via APP");
                     } catch (Exception e) {
                         e.printStackTrace();
                         if (actionType == 0) {
@@ -499,6 +496,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                         } else {
                             onLockAction("102", mActivity.getString(R.string.something_wrong), "open lock");
                         }
+                        updateLockStatus(mMap, (actionType == 0) ? "Failed to close via APP" : "Failed to open via APP");
                     }
                     //unlockRecordUpload("Locked via App");
                     SFProgress.hideProgressDialog(mActivity);
@@ -516,6 +514,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                     } else {
                         onLockAction("102", "failed to open the lock.", "open lock");
                     }
+                    updateLockStatus(mMap, (actionType == 0) ? "Failed to close via APP" : "Failed to open via APP");
                     SFProgress.hideProgressDialog(mActivity);
                 }
             });
@@ -578,7 +577,6 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     public void getDeviceInfo(String... strParams) {
         initApiCall();
         SFProgress.showProgressDialog(mActivity, true);
-//"103599","C29BD1254FB14B28B129F972C909AF5B1FBD3EA8F5EA4E50A7DA7B10269DD8B8"
         LoginBean.InfoBean mBeanUser = UserSessions.getUserInfo(mActivity);
         mApiCall.getDeviceInfo(this, strParams[0], mBeanUser.getUid(), UserSessions.getAccessToken(mActivity));
     }

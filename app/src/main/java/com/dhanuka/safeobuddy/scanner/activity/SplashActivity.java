@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity ;
 import com.codersworld.safelib.SafeLock;
 import com.codersworld.safelib.beans.AllLocksBean;
 import com.codersworld.safelib.beans.GateRecordsBean;
+import com.codersworld.safelib.beans.LockRecordsBean;
 import com.codersworld.safelib.listeners.OnSafeAuthListener;
 import com.codersworld.safelib.utils.CommonMethods;
 import com.dhanuka.safeobuddy.R;
@@ -37,8 +38,12 @@ public class SplashActivity extends AppCompatActivity implements OnSafeAuthListe
      }
 
     public void onScan(View v) {
-        //mSafeLock.authUser("shutterlock", "123456", "1.0", "Safe SDL demo");
-        mSafeLock.authUser("uffizio", "uffizio123", "1.0", "Safe SDL demo");
+
+        mSafeLock.manualLockAction("9605866",1);
+        mSafeLock.getLockRecords("9605866");
+
+        //mSafeLock.getDeviceRecords(startDate, endDate, "9605866", mListLocks.get(0).getVehicleNumber());
+
     }
 
     @Override
@@ -46,7 +51,6 @@ public class SplashActivity extends AppCompatActivity implements OnSafeAuthListe
         Log.e("onSafeAuth", errorCode + "\n" + message);
         if (errorCode.equalsIgnoreCase("106")) {
 
-            //mSafeLock.manualLockAction("9605866",1);
             mSafeLock.getDeviceList();
         }
 //J6o+BXjdFci24T7EcRf2bb4+n2ETbMq/f62L6WifcirH5SiYFdP92RPddHC6mnvrJW4WjEMQt0AioYE/0s79T0Rs/zCj/tEgek/5c/8GwHvDN8r8Rc4NeHkuB6vPxbZtNJlPxKsF/dgHZ8n2EzJMNvN5q99zKaav4udCUaFFCiQ=
@@ -59,8 +63,6 @@ public class SplashActivity extends AppCompatActivity implements OnSafeAuthListe
         if (errorCode.equalsIgnoreCase("106")) {
             if (CommonMethods.isValidArrayList(mListLocks)) {
                 Log.e("mListLocks", new Gson().toJson(mListLocks));
-                String startDate = CommonMethods.getCalculatedDate("MM/dd/yyyy", -27);
-                String endDate = CommonMethods.getCurrentFormatedDate("MM/dd/yyyy");
 
                 for(int a=0;a<mListLocks.size();a++) {
                     Log.e("locakname",mListLocks.get(a).getVehicleNumber());
@@ -69,7 +71,8 @@ public class SplashActivity extends AppCompatActivity implements OnSafeAuthListe
                     }
                 }
               //  mSafeLock.openLock(System.currentTimeMillis(),"wifi smart meter");
-                mSafeLock.getDeviceRecords(startDate, endDate, mListLocks.get(0).getDeviceID(), mListLocks.get(0).getVehicleNumber());
+                //?method=GetVehicle_Lock_Summary_Other&FromDate=01/11/2024&ToDate=01/18/2024&VehicleNumber=FRANCHISE%20LOCK&DeviceId=9605866&contactid=103599&val1=&val2=&type=18
+
             }
             //mSafeLock.getDeviceList();
         }
@@ -77,7 +80,7 @@ public class SplashActivity extends AppCompatActivity implements OnSafeAuthListe
     }
 
     @Override
-    public void onSafeRecords(String errorCode, String message, ArrayList<GateRecordsBean.InfoBean> mListRecords) {
+    public void onSafeRecords(String errorCode, String message, ArrayList<LockRecordsBean.InfoBean> mListRecords) {
         Log.e("onSafeRecords", errorCode + "\n" + message);
         if (errorCode.equalsIgnoreCase("106")) {
             if (CommonMethods.isValidArrayList(mListRecords)) {

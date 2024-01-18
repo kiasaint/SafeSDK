@@ -18,6 +18,26 @@ public class SensitiveInfo implements Serializable {
     String btlockid;
     @SerializedName("btlockidval")
     String btlockidval;
+   @SerializedName("GPSDeviceId")
+    String GPSDeviceId;
+   @SerializedName("GPSDeviceCode")
+    String GPSDeviceCode;
+
+    public String getGPSDeviceId() {
+        return GPSDeviceId;
+    }
+
+    public void setGPSDeviceId(String GPSDeviceId) {
+        this.GPSDeviceId = GPSDeviceId;
+    }
+
+    public String getGPSDeviceCode() {
+        return GPSDeviceCode;
+    }
+
+    public void setGPSDeviceCode(String GPSDeviceCode) {
+        this.GPSDeviceCode = GPSDeviceCode;
+    }
 
     public String getLockData() {
         return LockData;
