@@ -9,8 +9,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Vibrator;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -444,6 +446,29 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     public void manualLockAction(String lockId, int type) {//1 for lock open 0 for lock close
         deviceCode = lockId;
         actionType = type;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+            try {
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                Uri uri = Uri.fromParts("package", mActivity.getPackageName(), null);
+                intent.setData(uri);
+                mActivity.startActivityForResult(intent,STORAGE_PERMISSION_CODE);
+            }catch (Exception e){
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                mActivity.startActivityForResult(intent,STORAGE_PERMISSION_CODE);
+            }
+        }else{
+            //Below android 11
+            ActivityCompat.requestPermissions(
+                    mActivity,
+                    new String[]{
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            Manifest.permission.READ_EXTERNAL_STORAGE
+                    },
+                    STORAGE_PERMISSION_CODE
+            );
+        }
         getDeviceInfo(lockId);
     }
 
@@ -459,6 +484,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
             m.requestForPermissions();
         }
     }
+    private static final int STORAGE_PERMISSION_CODE = 23;
 
     protected void actionLock() {
         iniDateTime = System.currentTimeMillis() + 1800000;
@@ -482,6 +508,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
             TTLockClient.getDefault().controlLock((actionType == 0) ? ControlAction.LOCK : ControlAction.UNLOCK, lockData, macID, new ControlLockCallback() {
                 @Override
                 public void onControlLockSuccess(ControlLockResult controlLockResult) {
+                    SFProgress.hideProgressDialog(mActivity);
                     try {
                         if (actionType == 0) {
                             onLockAction("106", "Device is locked successfully.", "close lock");
@@ -499,11 +526,11 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                         updateLockStatus(mMap, (actionType == 0) ? "Failed to close via APP" : "Failed to open via APP");
                     }
                     //unlockRecordUpload("Locked via App");
-                    SFProgress.hideProgressDialog(mActivity);
                 }
 
                 @Override
                 public void onFail(LockError error) {
+                    SFProgress.hideProgressDialog(mActivity);
                     try {
                         Log.e("Lockerror", error.getErrorMsg() + "\n" + error.getDescription());
                     } catch (Exception e) {
@@ -515,7 +542,6 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                         onLockAction("102", "failed to open the lock.", "open lock");
                     }
                     updateLockStatus(mMap, (actionType == 0) ? "Failed to close via APP" : "Failed to open via APP");
-                    SFProgress.hideProgressDialog(mActivity);
                 }
             });
         }

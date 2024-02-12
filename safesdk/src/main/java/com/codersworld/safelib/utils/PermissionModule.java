@@ -3,9 +3,12 @@ package com.codersworld.safelib.utils;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,17 +27,21 @@ public class PermissionModule {
         mContext = context;
     }
 
+
     public Boolean checkBTPermissions() {
         permissionsNeeded = new ArrayList<>();
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
             permissionsNeeded.add(Manifest.permission.BLUETOOTH);
         }
+        //Android is 11 (R) or above
+
+        /*
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             permissionsNeeded.add(Manifest.permission.READ_EXTERNAL_STORAGE);
         }
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             permissionsNeeded.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-        }
+        }*/
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
             permissionsNeeded.add(Manifest.permission.BLUETOOTH_ADMIN);
         }

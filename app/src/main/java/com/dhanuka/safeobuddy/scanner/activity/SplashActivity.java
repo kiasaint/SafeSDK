@@ -4,11 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity ;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.codersworld.safelib.SafeLock;
 import com.codersworld.safelib.beans.AllLocksBean;
@@ -24,37 +25,48 @@ import java.util.ArrayList;
 
 public class SplashActivity extends AppCompatActivity implements OnSafeAuthListener {
     SafeLock mSafeLock;
+    EditText etId;
+    TextView txtResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        etId = findViewById(R.id.etLockId);
+        txtResult = findViewById(R.id.txtResult);
         mSafeLock = new SafeLock(SplashActivity.this, this);
-        //startActivityForResult(new Intent(this, ScanActivity.class).putExtra("open_scanner", true), 102);
-        // CommonMethods.successToast(this, AppUrls.GET_UOM_ITEM);
-       // mSafeLock.authUser("shutterlock", "123456", "1.0", "Safe SDL demo");
-        mSafeLock.authUser("uffizio", "uffizio123", "1.0", "Safe SDL demo");
-       // mSafeLock.authUser("uffizio", "uffizio123", "1.0", "Safe SDL demo");
-     }
-
-    public void onScan(View v) {
-
-        mSafeLock.manualLockAction("9605866",1);
-        mSafeLock.getLockRecords("9605866");
-
-        //mSafeLock.getDeviceRecords(startDate, endDate, "9605866", mListLocks.get(0).getVehicleNumber());
-
+        mSafeLock.authUser("uffizio", "uffizio123", "1.0", "Safe SDK demo");
+    }
+//        mSafeLock.getLockRecords("9605866");
+    public void onOpen(View v) {
+        if (CommonMethods.isValidString(etId.getText().toString())) {
+            mSafeLock.manualLockAction(etId.getText().toString(), 1);
+        } else {
+            Toast.makeText(this, "Enter device id", Toast.LENGTH_SHORT).show();
+        }
+    }
+    public void onClose(View v) {
+        if (CommonMethods.isValidString(etId.getText().toString())) {
+            mSafeLock.manualLockAction(etId.getText().toString(), 0);
+        } else {
+            Toast.makeText(this, "Enter device id", Toast.LENGTH_SHORT).show();
+        }
+    }
+    public void getRecords(View v) {
+        if (CommonMethods.isValidString(etId.getText().toString())) {
+            mSafeLock.getLockRecords(etId.getText().toString());
+        } else {
+            Toast.makeText(this, "Enter device id", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
     public void onSafeAuth(String errorCode, String message) {
         Log.e("onSafeAuth", errorCode + "\n" + message);
         if (errorCode.equalsIgnoreCase("106")) {
-
+            Toast.makeText(this, "Authenticated successfully.", Toast.LENGTH_SHORT).show();
             mSafeLock.getDeviceList();
         }
-//J6o+BXjdFci24T7EcRf2bb4+n2ETbMq/f62L6WifcirH5SiYFdP92RPddHC6mnvrJW4WjEMQt0AioYE/0s79T0Rs/zCj/tEgek/5c/8GwHvDN8r8Rc4NeHkuB6vPxbZtNJlPxKsF/dgHZ8n2EzJMNvN5q99zKaav4udCUaFFCiQ=
-//J6o+BXjdFci24T7EcRf2bb4+n2ETbMq/f62L6Wifcio+Kv/OikdeUxB5RF1jj6Ea+eMhs7wGXNtgLtkRv1vijIxHYGUD20j+dbaHAlvH+zx8cljnFqJkj0QWmz/Xe/Gq9Q1ZZc2rowimqh2Y3DMLMRiWX+fCDsd5Vs9KzYg9+LM=
     }
 
     @Override
@@ -64,13 +76,13 @@ public class SplashActivity extends AppCompatActivity implements OnSafeAuthListe
             if (CommonMethods.isValidArrayList(mListLocks)) {
                 Log.e("mListLocks", new Gson().toJson(mListLocks));
 
-                for(int a=0;a<mListLocks.size();a++) {
-                    Log.e("locakname",mListLocks.get(a).getVehicleNumber());
+                for (int a = 0; a < mListLocks.size(); a++) {
+                    Log.e("locakname", mListLocks.get(a).getVehicleNumber());
                     if (mListLocks.get(a).getVehicleNumber().equalsIgnoreCase("FRANCHISE LOCK")) {
                         mSafeLock.openLock(System.currentTimeMillis(), mListLocks.get(a).getDeviceCode());
                     }
                 }
-              //  mSafeLock.openLock(System.currentTimeMillis(),"wifi smart meter");
+                //  mSafeLock.openLock(System.currentTimeMillis(),"wifi smart meter");
                 //?method=GetVehicle_Lock_Summary_Other&FromDate=01/11/2024&ToDate=01/18/2024&VehicleNumber=FRANCHISE%20LOCK&DeviceId=9605866&contactid=103599&val1=&val2=&type=18
 
             }
@@ -85,13 +97,19 @@ public class SplashActivity extends AppCompatActivity implements OnSafeAuthListe
         if (errorCode.equalsIgnoreCase("106")) {
             if (CommonMethods.isValidArrayList(mListRecords)) {
                 Log.e("mListRecords", new Gson().toJson(mListRecords));
+                txtResult.setText(new Gson().toJson(mListRecords));
             }
+
+        }else{
+            txtResult.setText(message);
 
         }
     }
 
     @Override
     public void onSafeLockAction(String code, String message, String type) {
-Log.e("action_lock",code+"\n"+message+"\n"+type);
+        Toast.makeText(this, " "+message, Toast.LENGTH_SHORT).show();
+
+        Log.e("action_lock", code + "\n" + message + "\n" + type);
     }
 }
