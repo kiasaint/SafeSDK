@@ -447,7 +447,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         deviceCode = lockId;
         actionType = type;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
-            try {
+           /* try {
                 Intent intent = new Intent();
                 intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
                 Uri uri = Uri.fromParts("package", mActivity.getPackageName(), null);
@@ -457,7 +457,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                 Intent intent = new Intent();
                 intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
                 mActivity.startActivityForResult(intent,STORAGE_PERMISSION_CODE);
-            }
+            }*/
         }else{
             //Below android 11
             ActivityCompat.requestPermissions(
