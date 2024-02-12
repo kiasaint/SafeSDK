@@ -965,7 +965,11 @@ public class ApiCall {
                     if (response != null) {
                         try {
                              DeviceInfoBean mBean = new Gson().fromJson(response.body().toString(),DeviceInfoBean.class);
-                            onResponse.onSuccess(new UniverSelObjct(mBean, Links.SB_API_GET_DEVICE_INFO, "true", ""));
+                             if(mBean !=null) {
+                                 onResponse.onSuccess(new UniverSelObjct(mBean, Links.SB_API_GET_DEVICE_INFO, "true", ""));
+                             }else{
+                                 onResponse.onError(Links.SB_API_GET_DEVICE_INFO, mContext.getResources().getString(R.string.something_wrong));
+                             }
                         } catch (Exception e) {
                             e.printStackTrace();
                             onResponse.onError(Links.SB_API_GET_DEVICE_INFO, mContext.getResources().getString(R.string.something_wrong));
