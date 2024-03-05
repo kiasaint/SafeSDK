@@ -35,7 +35,8 @@ public class SplashActivity extends AppCompatActivity implements OnSafeAuthListe
         etId = findViewById(R.id.etLockId);
         txtResult = findViewById(R.id.txtResult);
         mSafeLock = new SafeLock(SplashActivity.this, this);
-        mSafeLock.authUser("uffizio", "uffizio123", "1.0", "Safe SDK demo");
+      //  mSafeLock.authUser("uffizio", "uffizio123", "1.0", "Safe SDK demo");
+        mSafeLock.authUser("prashant67", "prashant67", "1.0", "Safe SDK demo");
     }
 //        mSafeLock.getLockRecords("9605866");
     public void onOpen(View v) {
@@ -65,7 +66,7 @@ public class SplashActivity extends AppCompatActivity implements OnSafeAuthListe
         Log.e("onSafeAuth", errorCode + "\n" + message);
         if (errorCode.equalsIgnoreCase("106")) {
             Toast.makeText(this, "Authenticated successfully.", Toast.LENGTH_SHORT).show();
-            mSafeLock.getDeviceList();
+            //mSafeLock.getDeviceList();
         }
     }
 
