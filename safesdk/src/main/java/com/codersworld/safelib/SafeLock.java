@@ -95,7 +95,10 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
 
     private static void getInstance(Activity activity) {
         mActivity = activity;
-        statusCheck();
+    }
+
+    public void checkPermission(){
+        //statusCheck();
         try {
             final BluetoothAdapter bAdapter = BluetoothAdapter.getDefaultAdapter();
             if (ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
@@ -112,8 +115,8 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
 
+    }
     public static void statusCheck() {
         final LocationManager manager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -475,13 +478,19 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     int actionType = -1;
 
     public void closeLock(String deviceCode/*String lockData, String macID*/) {
-        actionType = 0;
-        this.deviceCode = deviceCode;
-        PermissionModule m = new PermissionModule(mActivity);
-        if (m.checkBTPermissions()) {
-            actionLock();
-        } else {
-            m.requestForPermissions();
+        checkPermission();
+        final LocationManager manager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            buildAlertMessageNoGps();
+        }else{
+            actionType = 0;
+            this.deviceCode = deviceCode;
+            PermissionModule m = new PermissionModule(mActivity);
+            if (m.checkBTPermissions()) {
+                actionLock();
+            } else {
+                m.requestForPermissions();
+            }
         }
     }
     private static final int STORAGE_PERMISSION_CODE = 23;
@@ -548,13 +557,19 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     }
 
     public void openLock(long unlockdate, String deviceCode) {
-        this.deviceCode = deviceCode;
-        actionType = 1;
-        PermissionModule m = new PermissionModule(mActivity);
-        if (m.checkBTPermissions()) {
-            actionLock();
-        } else {
-            m.requestForPermissions();
+        checkPermission();
+        final LocationManager manager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            buildAlertMessageNoGps();
+        }else{
+            this.deviceCode = deviceCode;
+            actionType = 1;
+            PermissionModule m = new PermissionModule(mActivity);
+            if (m.checkBTPermissions()) {
+                actionLock();
+            } else {
+                m.requestForPermissions();
+            }
         }
     }
 
