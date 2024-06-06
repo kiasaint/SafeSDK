@@ -68,7 +68,7 @@ public class SplashActivity extends AppCompatActivity implements OnSafeAuthListe
         Log.e("onSafeAuth", errorCode + "\n" + message);
         if (errorCode.equalsIgnoreCase("106")) {
             Toast.makeText(this, "Authenticated successfully.", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(SplashActivity.this, SplashActivity2.class));
+            //startActivity(new Intent(SplashActivity.this, HomeActivity.class));
 
             //mSafeLock.getDeviceList();
         }
