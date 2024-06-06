@@ -71,7 +71,7 @@ public class PermissionModule {
             }catch (Exception e){
                 e.printStackTrace();
             }
-            //requestForPermissions();
+            requestForPermissions();
             return false;
         } else {
             return true;

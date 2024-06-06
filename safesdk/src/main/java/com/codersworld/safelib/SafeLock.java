@@ -77,6 +77,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     OnSafeAuthListener mAuthListener = null;
     SQLiteDatabase database = null;
     ArrayList<SensitiveInfo> mInfo = new ArrayList<>();
+    ArrayList<AllLocksBean.InfoBean> mDevices = new ArrayList<>();
 
 
     public SafeLock(Activity activity, OnSafeAuthListener listener) {
@@ -282,6 +283,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                     try {
                         AllLocksBean mAllLocksBean = (AllLocksBean) response.getResponse();
                         if (mAllLocksBean != null) {
+                            Log.e("mAllLocksBean1",new Gson().toJson(mAllLocksBean));
                             if (mAllLocksBean.getSuccess() == 1) {
                                 if (CommonMethods.isValidArrayList(mAllLocksBean.getNewusercreation())) {
                                     mInfo = new ArrayList<>();
@@ -304,7 +306,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                                         mAllLocksBean.getNewusercreation().get(a).setBtlockidval("");
                                         mAllLocksBean.getNewusercreation().get(a).setOwner_id(UserSessions.getUserInfo(mActivity).getUid());
                                     }
-                                    UserSessions.saveMap(mActivity, (mInfo.size() > 0) ? mInfo : new ArrayList<>());
+                                     UserSessions.saveMap(mActivity, (mInfo.size() > 0) ? mInfo : new ArrayList<>());
                                     onSafeDevices("106", "success", mAllLocksBean.getNewusercreation());
                                 } else {
                                     //no data found

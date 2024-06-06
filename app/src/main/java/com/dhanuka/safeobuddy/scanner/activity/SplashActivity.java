@@ -36,7 +36,9 @@ public class SplashActivity extends AppCompatActivity implements OnSafeAuthListe
         txtResult = findViewById(R.id.txtResult);
         mSafeLock = new SafeLock(SplashActivity.this, this);
       //  mSafeLock.authUser("uffizio", "uffizio123", "1.0", "Safe SDK demo");
-        mSafeLock.authUser("prashant67", "prashant67", "1.0", "Safe SDK demo");
+        //mSafeLock.authUser("prashant67", "prashant67", "1.0", "Safe SDK demo");
+        //mSafeLock.authUser("prashant67", "prashant67", "1.0", "Safe SDK demo");
+        mSafeLock.authUser("depl", "depl987", "1.0", "Safe SDK demo");
     }
 //        mSafeLock.getLockRecords("9605866");
     public void onOpen(View v) {
@@ -66,6 +68,8 @@ public class SplashActivity extends AppCompatActivity implements OnSafeAuthListe
         Log.e("onSafeAuth", errorCode + "\n" + message);
         if (errorCode.equalsIgnoreCase("106")) {
             Toast.makeText(this, "Authenticated successfully.", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(SplashActivity.this, SplashActivity2.class));
+
             //mSafeLock.getDeviceList();
         }
     }
@@ -83,13 +87,8 @@ public class SplashActivity extends AppCompatActivity implements OnSafeAuthListe
                         mSafeLock.openLock(System.currentTimeMillis(), mListLocks.get(a).getDeviceCode());
                     }
                 }
-                //  mSafeLock.openLock(System.currentTimeMillis(),"wifi smart meter");
-                //?method=GetVehicle_Lock_Summary_Other&FromDate=01/11/2024&ToDate=01/18/2024&VehicleNumber=FRANCHISE%20LOCK&DeviceId=9605866&contactid=103599&val1=&val2=&type=18
-
             }
-            //mSafeLock.getDeviceList();
         }
-
     }
 
     @Override
