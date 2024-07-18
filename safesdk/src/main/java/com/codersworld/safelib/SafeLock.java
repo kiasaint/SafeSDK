@@ -561,7 +561,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         }
     }
 
-    protected void actionManualLock(String lockData, String macID, int mActionType) {
+    public void actionManualLock(String lockData, String macID, int mActionType) {
         checkPermission();
         final LocationManager manager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
