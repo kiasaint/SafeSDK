@@ -98,7 +98,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         mActivity = activity;
     }
 
-    public void checkPermission(){
+    public void checkPermission() {
         //statusCheck();
         try {
             final BluetoothAdapter bAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -118,6 +118,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         }
 
     }
+
     public static void statusCheck() {
         final LocationManager manager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -176,7 +177,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         String strDeviceId = (CommonMethods.isValidString(mMap.getLOCK_ID())) ? mMap.getLOCK_ID() : (CommonMethods.isValidString(mMap.getLOCK_CODE()) ? mMap.getLOCK_CODE() : "");
         mInfo = new ArrayList<>();
         mListLocks = new ArrayList<>();
-         mApiCall.saveLockStatus(this, UserSessions.getUserInfo(mActivity).getUid(),
+        mApiCall.saveLockStatus(this, UserSessions.getUserInfo(mActivity).getUid(),
                 strDeviceId, UserSessions.getUserInfo(mActivity).getUsername(), msg, "6", "", "TTLock");
     }
 
@@ -188,7 +189,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     private void getLockRecordsData(DeviceInfoBean.InfoBean mMap) {
         initApiCall();
         mListLocks = new ArrayList<>();
-         String startDate = CommonMethods.getCalculatedDate("MM/dd/yyyy", -7);
+        String startDate = CommonMethods.getCalculatedDate("MM/dd/yyyy", -7);
         String endDate = CommonMethods.getCurrentFormatedDate("MM/dd/yyyy");
         mApiCall.getGateRecordsData(this, startDate, endDate, mMap.getVehicleNumber(), mMap.getLockId(), UserSessions.getUserInfo(mActivity).getUid(), "18", "", "");
     }
@@ -213,7 +214,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                     }
                     try {
                         DeviceInfoBean mDeviceInfoBean = (DeviceInfoBean) response.getResponse();
-                         if (mDeviceInfoBean.getSuccess() == 1) {
+                        if (mDeviceInfoBean.getSuccess() == 1) {
                             mInfo = new ArrayList<>();
                             for (int a = 0; a < mDeviceInfoBean.getReturnds().size(); a++) {
                                 if (CommonMethods.isValidString(mDeviceInfoBean.getReturnds().get(a).getLockdata()) && CommonMethods.isValidString(mDeviceInfoBean.getReturnds().get(a).getMacId())) {
@@ -283,7 +284,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                     try {
                         AllLocksBean mAllLocksBean = (AllLocksBean) response.getResponse();
                         if (mAllLocksBean != null) {
-                            Log.e("mAllLocksBean1",new Gson().toJson(mAllLocksBean));
+                            Log.e("mAllLocksBean1", new Gson().toJson(mAllLocksBean));
                             if (mAllLocksBean.getSuccess() == 1) {
                                 if (CommonMethods.isValidArrayList(mAllLocksBean.getNewusercreation())) {
                                     mInfo = new ArrayList<>();
@@ -306,7 +307,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                                         mAllLocksBean.getNewusercreation().get(a).setBtlockidval("");
                                         mAllLocksBean.getNewusercreation().get(a).setOwner_id(UserSessions.getUserInfo(mActivity).getUid());
                                     }
-                                     UserSessions.saveMap(mActivity, (mInfo.size() > 0) ? mInfo : new ArrayList<>());
+                                    UserSessions.saveMap(mActivity, (mInfo.size() > 0) ? mInfo : new ArrayList<>());
                                     onSafeDevices("106", "success", mAllLocksBean.getNewusercreation());
                                 } else {
                                     //no data found
@@ -451,7 +452,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     public void manualLockAction(String lockId, int type) {//1 for lock open 0 for lock close
         deviceCode = lockId;
         actionType = type;
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
            /* try {
                 Intent intent = new Intent();
                 intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
@@ -463,7 +464,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                 intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
                 mActivity.startActivityForResult(intent,STORAGE_PERMISSION_CODE);
             }*/
-        }else{
+        } else {
             //Below android 11
             ActivityCompat.requestPermissions(
                     mActivity,
@@ -484,7 +485,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         final LocationManager manager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             buildAlertMessageNoGps();
-        }else{
+        } else {
             actionType = 0;
             this.deviceCode = deviceCode;
             PermissionModule m = new PermissionModule(mActivity);
@@ -495,6 +496,8 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
             }
         }
     }
+
+
     private static final int STORAGE_PERMISSION_CODE = 23;
 
     protected void actionLock() {
@@ -558,12 +561,76 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         }
     }
 
+    protected void actionManualLock(String lockData, String macID, int mActionType) {
+        checkPermission();
+        final LocationManager manager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            buildAlertMessageNoGps();
+        } else {
+            PermissionModule m = new PermissionModule(mActivity);
+            if (m.checkBTPermissions()) {
+                iniDateTime = System.currentTimeMillis() + 1800000;
+                long unlockdate = System.currentTimeMillis();
+                if (iniDateTime < unlockdate) {
+                    onLockAction("100", "Please Refresh Page", (mActionType == 0) ? "close lock" : "open lock");
+                    return;
+                }
+
+                if (CommonMethods.isValidString(lockData) && CommonMethods.isValidString(macID)) {
+                    SFProgress.showProgressDialog(mActivity, true);
+                    TTLockClient.getDefault().controlLock((mActionType == 0) ? ControlAction.LOCK : ControlAction.UNLOCK, lockData, macID, new ControlLockCallback() {
+                        @Override
+                        public void onControlLockSuccess(ControlLockResult controlLockResult) {
+                            SFProgress.hideProgressDialog(mActivity);
+                            try {
+                                if (mActionType == 0) {
+                                    onLockAction("106", "Device is locked successfully.", "close lock");
+                                } else {
+                                    onLockAction("106", "Lock opened successfully.", "open lock");
+                                }
+                                //updateLockStatus(mMap, (mActionType == 0) ? "Closed via APP" : "Opened via APP");
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                if (mActionType == 0) {
+                                    onLockAction("101", mActivity.getString(R.string.something_wrong), "close lock");
+                                } else {
+                                    onLockAction("102", mActivity.getString(R.string.something_wrong), "open lock");
+                                }
+                                //updateLockStatus(mMap, (mActionType == 0) ? "Failed to close via APP" : "Failed to open via APP");
+                            }
+                            //unlockRecordUpload("Locked via App");
+                        }
+
+                        @Override
+                        public void onFail(LockError error) {
+                            SFProgress.hideProgressDialog(mActivity);
+                            try {
+                                Log.e("Lockerror", error.getErrorMsg() + "\n" + error.getDescription());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            if (mActionType == 0) {
+                                onLockAction("100", "Failed to lock the device.", "close lock");
+                            } else {
+                                onLockAction("102", "failed to open the lock.", "open lock");
+                            }
+                            // updateLockStatus(mMap, (mActionType == 0) ? "Failed to close via APP" : "Failed to open via APP");
+                        }
+                    });
+                }
+
+            } else {
+                m.requestForPermissions();
+            }
+        }
+    }
+
     public void openLock(long unlockdate, String deviceCode) {
         checkPermission();
         final LocationManager manager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             buildAlertMessageNoGps();
-        }else{
+        } else {
             this.deviceCode = deviceCode;
             actionType = 1;
             PermissionModule m = new PermissionModule(mActivity);
