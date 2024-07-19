@@ -511,7 +511,6 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
             return;
         }
 
-
         String lockData = (CommonMethods.isValidString(mMap.getLockData())) ? mMap.getLockData() : "";
         String macID = (CommonMethods.isValidString(mMap.getMACID())) ? mMap.getMACID() : "";
         String btlockid = (CommonMethods.isValidString(mMap.getBtlockid())) ? mMap.getBtlockid() : "";
@@ -561,7 +560,11 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
         }
     }
 
-    public void actionManualLock(String lockData, String macID, int mActionType) {
+    int actionCounter = 0;
+
+    public void actionManualLock(String lockData, String macID, int mActionType, String mDeviceCode) {
+        actionType =mActionType;
+        deviceCode = mDeviceCode;
         checkPermission();
         final LocationManager manager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -604,15 +607,20 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                         @Override
                         public void onFail(LockError error) {
                             SFProgress.hideProgressDialog(mActivity);
-                            try {
-                                Log.e("Lockerror", error.getErrorMsg() + "\n" + error.getDescription());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            if (mActionType == 0) {
-                                onLockAction("100", "Failed to lock the device.", "close lock");
+                            if (actionCounter == 0) {
+                                actionCounter++;
+                                getDeviceInfo(mDeviceCode);
                             } else {
-                                onLockAction("102", "failed to open the lock.", "open lock");
+                                try {
+                                    Log.e("Lockerror", error.getErrorMsg() + "\n" + error.getDescription());
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                if (mActionType == 0) {
+                                    onLockAction("100", "Failed to lock the device.", "close lock");
+                                } else {
+                                    onLockAction("102", "failed to open the lock.", "open lock");
+                                }
                             }
                             // updateLockStatus(mMap, (mActionType == 0) ? "Failed to close via APP" : "Failed to open via APP");
                         }

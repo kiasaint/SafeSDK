@@ -70,7 +70,7 @@ public class SplashActivity extends AppCompatActivity implements OnSafeAuthListe
             Toast.makeText(this, "Authenticated successfully.", Toast.LENGTH_SHORT).show();
             //startActivity(new Intent(SplashActivity.this, HomeActivity.class));
 
-            //mSafeLock.actionManualLock();
+            mSafeLock.actionManualLock("","",1);
         }
     }
 
