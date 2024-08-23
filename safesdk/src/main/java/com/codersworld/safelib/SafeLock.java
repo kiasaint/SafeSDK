@@ -694,9 +694,18 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
 
     public void getDeviceInfo(String... strParams) {
         initApiCall();
-        SFProgress.showProgressDialog(mActivity, true);
-        LoginBean.InfoBean mBeanUser = UserSessions.getUserInfo(mActivity);
-        mApiCall.getDeviceInfo(this, strParams[0], mBeanUser.getUid(), UserSessions.getAccessToken(mActivity));
+        try {
+            SFProgress.showProgressDialog(mActivity, true);
+            LoginBean.InfoBean mBeanUser = UserSessions.getUserInfo(mActivity);
+            mApiCall.getDeviceInfo(this, strParams[0], mBeanUser.getUid(), UserSessions.getAccessToken(mActivity));
+        }catch (Exception e){
+            e.printStackTrace();
+            if (actionType == 0) {
+                onLockAction("100", "Failed to lock the device.", "close lock");
+            } else {
+                onLockAction("102", "failed to open the lock.", "open lock");
+            }
+        }
     }
 
 
