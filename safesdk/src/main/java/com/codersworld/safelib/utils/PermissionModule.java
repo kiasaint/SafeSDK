@@ -60,7 +60,10 @@ public class PermissionModule {
 
             // Optional: BLUETOOTH_PRIVILEGED is only needed for privileged apps
             if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.BLUETOOTH_PRIVILEGED) != PackageManager.PERMISSION_GRANTED) {
-                permissionsNeeded.add(Manifest.permission.BLUETOOTH_PRIVILEGED);
+                //permissionsNeeded.add(Manifest.permission.BLUETOOTH_PRIVILEGED);
+                String arr[] = new String[]{Manifest.permission.BLUETOOTH_PRIVILEGED};
+                requestPermission(arr);
+
             }
         }
 
