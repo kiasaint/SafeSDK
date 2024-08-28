@@ -348,31 +348,39 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
                         if (mDeviceDetailBean != null) {
                             ArrayList<SensitiveInfo> mMap2 = new ArrayList<>();
                             mMap2 = UserSessions.getMap(mActivity);
-                            for (int a = 0; a < mMap2.size(); a++) {
-                                if (mMap2.get(a).getBtlockidval().equalsIgnoreCase(deviceCode)) {
-                                    SensitiveInfo mMap3 = mMap2.get(a);
-                                    mMap3.setLockData(mDeviceDetailBean.getLockData());
-                                    mMap3.setMACID(mDeviceDetailBean.getLockMac());
-                                    mMap3.setLOCK_CODE(mMap3.getLOCK_CODE());
-                                    mMap3.setLOCK_ID(mMap3.getLOCK_ID());
-                                    mMap3.setBtlockid(mMap3.getBtlockid());
-                                    mMap3.setBtlockidval(mMap3.getBtlockidval());
-                                    mMap3.setGPSDeviceCode(mMap3.getGPSDeviceCode());
-                                    mMap3.setGPSDeviceId(mMap3.getGPSDeviceId());
-                                    mMap2.set(a, mMap3);
-                                    UserSessions.saveMap(mActivity, mMap2);
-                                    if (actionType == 1) {
-                                        openLock(System.currentTimeMillis(), deviceCode);
-                                    } else if (actionType == 0) {
-                                        closeLock(deviceCode);
+                            if (CommonMethods.isValidArrayList(mMap2)) {
+                                for (int a = 0; a < mMap2.size(); a++) {
+                                    if (mMap2.get(a).getBtlockidval().equalsIgnoreCase(deviceCode)) {
+                                        SensitiveInfo mMap3 = mMap2.get(a);
+                                        mMap3.setLockData(mDeviceDetailBean.getLockData());
+                                        mMap3.setMACID(mDeviceDetailBean.getLockMac());
+                                        mMap3.setLOCK_CODE(mMap3.getLOCK_CODE());
+                                        mMap3.setLOCK_ID(mMap3.getLOCK_ID());
+                                        mMap3.setBtlockid(mMap3.getBtlockid());
+                                        mMap3.setBtlockidval(mMap3.getBtlockidval());
+                                        mMap3.setGPSDeviceCode(mMap3.getGPSDeviceCode());
+                                        mMap3.setGPSDeviceId(mMap3.getGPSDeviceId());
+                                        mMap2.set(a, mMap3);
+                                        UserSessions.saveMap(mActivity, mMap2);
+                                        if (actionType == 1) {
+                                            openLock(System.currentTimeMillis(), deviceCode);
+                                        } else if (actionType == 0) {
+                                            closeLock(deviceCode);
+                                        }
+                                        new JKHelper().updateLockData(mActivity, mDeviceDetailBean.getLockData(), mDeviceDetailBean.getLockMac(), mDeviceDetailBean.getLockId());
                                     }
-                                    new JKHelper().updateLockData(mActivity, mDeviceDetailBean.getLockData(), mDeviceDetailBean.getLockMac(), mDeviceDetailBean.getLockId());
                                 }
                             }
                         }
 
                     } catch (Exception ex1) {
                         ex1.printStackTrace();
+                        if (actionType == 0) {
+                            onLockAction("101", mActivity.getString(R.string.something_wrong), "close lock");
+                        } else {
+                            onLockAction("102", mActivity.getString(R.string.something_wrong), "open lock");
+                        }
+
                     }
                     break;
             }
@@ -563,7 +571,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
     int actionCounter = 0;
 
     public void actionManualLock(String lockData, String macID, int mActionType, String mDeviceCode) {
-        actionType =mActionType;
+        actionType = mActionType;
         deviceCode = mDeviceCode;
         checkPermission();
         final LocationManager manager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
@@ -698,7 +706,7 @@ public class SafeLock implements OnResponse<UniverSelObjct>, OnAuthListener {
             SFProgress.showProgressDialog(mActivity, true);
             LoginBean.InfoBean mBeanUser = UserSessions.getUserInfo(mActivity);
             mApiCall.getDeviceInfo(this, strParams[0], mBeanUser.getUid(), UserSessions.getAccessToken(mActivity));
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             if (actionType == 0) {
                 onLockAction("100", "Failed to lock the device.", "close lock");
