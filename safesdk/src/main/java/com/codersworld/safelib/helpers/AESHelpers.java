@@ -2,6 +2,7 @@ package com.codersworld.safelib.helpers;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 
 import com.codersworld.safelib.utils.CommonMethods;
 
@@ -15,6 +16,7 @@ public class AESHelpers {
         String userid = (mUserSession != null && mUserSession.getUserInfo(context) != null) ? mUserSession.getUserInfo(context).getEmail() : "";
         try {
             //strParam = DhanukaMain.SafeOBuddyEncryptUtils(strParam, token, userid);
+            Log.e("encPRM",strParam);
             strParam = new AESHelper().safeEncryption(context,strParam,token,userid);
             return strParam;
         } catch (Exception e) {

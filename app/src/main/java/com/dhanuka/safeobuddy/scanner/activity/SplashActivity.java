@@ -38,7 +38,7 @@ public class SplashActivity extends AppCompatActivity implements OnSafeAuthListe
       //  mSafeLock.authUser("uffizio", "uffizio123", "1.0", "Safe SDK demo");
         //mSafeLock.authUser("prashant67", "prashant67", "1.0", "Safe SDK demo");
         //mSafeLock.authUser("prashant67", "prashant67", "1.0", "Safe SDK demo");
-        mSafeLock.authUser("depl", "depl987", "1.0", "Safe SDK demo");
+        mSafeLock.authUser("depl", "depl987", "1.0", "Safe SDK demo");
     }
 //        mSafeLock.getLockRecords("9605866");
     public void onOpen(View v) {
